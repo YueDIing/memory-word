@@ -2,12 +2,12 @@
 @import url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.css');
 @font-face {
   font-family: 'iconfont';  /* project id 1101085 */
-  src: url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.eot');
-  src: url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.woff2') format('woff2'),
-  url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.woff') format('woff'),
-  url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_1101085_xtti4t6u84.eot');
+  src: url('//at.alicdn.com/t/font_1101085_xtti4t6u84.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.woff') format('woff'),
+  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.svg#iconfont') format('svg');
 }
 *{
   margin: 0;
@@ -23,6 +23,9 @@ ul,li{
 a{
   text-decoration: none;
   color: #333;
+}
+input{
+  border: 1px solid #ccc;
 }
 body{
   background-color: #dfe4ea;
@@ -40,4 +43,44 @@ body{
   line-height: 45px;
   font-size: 24px;
   color: #1e90ff;
+}
+.ph-icon{
+  width: 19px;
+  height: 17px;
+  background: url(../../../static/img/audio.png) no-repeat 0 0;
+  background-size: 100%;
+  cursor: pointer;
+  &:hover{
+    background-image: url(../../../static/img/audio-active.png);
+  }
+}
+.btns{
+  height: 40px;
+  line-height: 40px;
+  padding: 0 5px;
+  color: white;
+  text-align: center;
+  background-color: #1e90ff;
+  transition: opacity .3s;
+  border-radius: 3px;
+}
+.btn-min{
+  .btns();
+  width: 125px;
+  cursor: pointer;
+  &:hover{
+    opacity: .7;
+  }
+}
+.close{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  border: 5px solid transparent;
+  cursor: pointer;
+  &:hover{
+    opacity: .7;
+  }
 }

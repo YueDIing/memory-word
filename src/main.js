@@ -13,3 +13,5 @@ new Vue({
   components: { App },
   template: '<App/>'
 })
+
+Vue.prototype.bus = new Vue()

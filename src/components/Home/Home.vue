@@ -4,40 +4,23 @@
     <div class="h-content">
       <audio class="hide" src="" ref="audio" controls autoplay></audio>
       <!-- <h3 class="title-24">全部单词</h3> -->
-      <!-- <ul class="classify" v-if="JSON.stringify(firstLetter) !== '{}'">
+      <ul class="h-classify" v-if="JSON.stringify(firstLetter) !== '{}'">
         <li
           v-for="(item, key, index) in firstLetter" :key="index"
+          :class="[(showIndex === index) ? 'current' : '']"
+          @click="showCurrent(index, key)"
         >
           {{key}}
         </li>
-      </ul> -->
-      <ul class="word-list" v-if="firstLetter['#']">
+      </ul>
+      <ul class="word-list" v-if="showWord">
         <li
-          v-for="(item, index) in firstLetter['#']"
+          v-for="(item, index) in showWord"
           :key="index"
           ref="wordItem"
           :style="{left: `${(item.x) ? item.x : 0}px`, top: `${(item.y) ? item.y : 0}px`}"
         >
-          <div class="word">{{item.word_en}}</div>
-          <div class="audio">
-            <div class="ph" v-if="item.ph_en">
-              <span>英</span>
-              <div class="en">[{{item.ph_en}}]</div>
-              <div class="ph-icon" @click="playSound(item.ph_en_mp3)"></div>
-            </div>
-            <div class="ph" v-if="item.ph_am">
-              <span>美</span>
-              <div class="am">[{{item.ph_am}}]</div>
-              <div class="ph-icon" @click="playSound(item.ph_am_mp3)"></div>
-            </div>
-          </div>
-          <ul class="cn-list">
-            <li v-for="(temp, tempIndex) in item.word_json" :key="tempIndex">
-              <div class="cn-item">
-                {{temp}}
-              </div>
-            </li>
-          </ul>
+          <Word :item="item"></Word>
         </li>
       </ul>
     </div>
@@ -47,16 +30,19 @@
 <script>
 import axios from 'axios'
 import Head from '../Head/Head'
+import Word from '../Repeat/Word'
 export default {
   name: 'Home',
   components: {
-    Head
+    Head,
+    Word
   },
   data () {
     return {
-      allWord: null, // 全部单词
+      showWord: null, // 当前显示单词,
+      showIndex: 0, // 当前显示单词分类的的index
       wordHeight: [], // 记录瀑布流的前4个的高度
-      firstLetter: {} // 首字母
+      firstLetter: {} // 按首字母字母排序 数据格式： {"#": array}
     }
   },
   beforeMount () { // 获取数据库中的单词
@@ -67,17 +53,31 @@ export default {
       let getData = res.data
       if (res.status === 200 && getData && getData.code && getData.code === 200) {
         let len = getData.data.length
+        // let currentWord = this.firstLetter
+        let newWord = {}
         for (let i = 0; i < len; i++) {
           getData.data[i].word_json = JSON.parse(getData.data[i].word_json)
           let letter = getData.data[i].word_en.slice(0, 1).toUpperCase() // 获取首字母
           // 以首字母分类
-          if (this.firstLetter[letter]) {
-            this.firstLetter[letter].push(getData.data[i])
+          if (newWord[letter]) {
+            newWord[letter].push(getData.data[i])
           } else {
-            this.$set(this.firstLetter, letter, [getData.data[i]])
+            newWord[letter] = [getData.data[i]]
           }
         }
-        this.$set(this.firstLetter, '#', getData.data)
+        newWord['#'] = getData.data
+        let classify = [] // 获取所有首字母分类
+        for (let item in newWord) {
+          classify.push(item)
+        }
+        let letterClassify = classify.sort()
+        let newClassifyWord = {}
+        // 把对象里的key以A-z的方式排列
+        for (let i = 0; i < letterClassify.length; i++) {
+          newClassifyWord[letterClassify[i]] = newWord[letterClassify[i]]
+        }
+        this.firstLetter = newClassifyWord
+        this.showWord = newClassifyWord['#']
         this.changeLayout() // 添加瀑布流布局
       }
     })
@@ -94,28 +94,27 @@ export default {
     })
   },
   methods: {
-    changeLayout () {
+    changeLayout () { // 改变layout为瀑布流域
       this.$nextTick(() => { // Vue 本身回调, 当v-for 渲染完成后执行
-        // 当节点渲染完成后, 把布局改变成瀑布流
         let word = this.$refs.wordItem
-        let len = this.firstLetter['#'].length
+        let len = this.showWord.length
         let num = 0
-        let column = 4
+        let column = 4 // 瀑布流排多少列
+        let interval = 25 // 每个之间的间隔
         for (let i = 0; i < len; i++) {
           if (num >= column) num = 0
           let width = word[i].offsetWidth
           let y = word[i].offsetHeight
           if (i < column) {
-            this.$set(this.firstLetter['#'][i], 'x', width * num + num * 25)
-            this.$set(this.firstLetter['#'][i], 'y', 0)
+            this.$set(this.showWord[i], 'x', width * num + num * interval)
+            this.$set(this.showWord[i], 'y', 0)
             this.wordHeight.push(y)
-            // console.log(num, this.firstLetter['#'][i])
           } else {
             let wordHeight = Math.min(...this.wordHeight)
             let minIndex = this.wordHeight.indexOf(wordHeight)
-            this.$set(this.firstLetter['#'][i], 'x', width * minIndex + 25 * minIndex)
-            this.$set(this.firstLetter['#'][i], 'y', this.wordHeight[minIndex] + 25)
-            this.wordHeight[minIndex] += y + 25
+            this.$set(this.showWord[i], 'x', width * minIndex + interval * minIndex)
+            this.$set(this.showWord[i], 'y', this.wordHeight[minIndex] + interval)
+            this.wordHeight[minIndex] += y + interval
           }
           num++
         }
@@ -127,12 +126,23 @@ export default {
       if (audio) {
         this.$refs.audio.src = url
       }
+    },
+    showCurrent (index, key) {
+      this.showIndex = index
+      this.showWord = this.firstLetter[key]
+      this.wordHeight = [] // 清空之前的瀑布流的数据
+      this.changeLayout()
+      console.log(this.firstLetter)
     }
   }
 }
 </script>
 
 <style lang='less' scoped>
+  .home > div{
+    // 防止滚动条抖动, 100vw(浏览器内部宽度， 包含滚动条宽度) 100%(可用宽度, 不包含滚动条宽度)
+    padding-left: calc(100vw - 100%);
+  }
   .display_flex{
     display: flex;
   }
@@ -142,15 +152,39 @@ export default {
   .h-content{
     width: 1330px;
     margin: 0 auto;
-    padding: 25px 15px;
+    padding: 0 15px;
+  }
+  .h-classify{
+    position: fixed;
+    z-index: 2;
+    margin-top: 25px;
+    padding: 20px 0;
+    font-size: 14px;
+    background-color: white;
+    transform: translateX(-250%);
+    li{
+      width: 45px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      cursor: pointer;
+      &:hover{
+        background: #1e90ff;
+        color: white;
+      }
+    }
+    .current{
+      background-color: #1e90ff;
+      color: white;
+    }
   }
   .word-list{
+    @value: 25px;
     position: relative;
-    margin-top: @value;
+    // margin-top: @value;
     .display_flex();
     width: 100%;
     flex-wrap: wrap;
-    @value: 25px;
     > li{
       position: absolute;
       width: calc(1225px / 4);
@@ -162,57 +196,5 @@ export default {
     /* > li:not(:nth-child(4n)){
       border-right: 25px solid #dfe4ea;
     } */
-  }
-  .word{
-    padding-bottom: 3px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    line-height: 30px;
-    font-weight: bold;
-    border-bottom: 1px solid #ced6e0;
-  }
-  .audio{
-    .display_flex();
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-    font-size: 14px;
-    line-height: 25px;
-    // margin-bottom: 8px;
-  }
-  .ph{
-    .display_flex();
-    align-items: center;
-    span{
-      display: block;
-      margin-right: 8px;
-    }
-    .en, .am{
-      white-space: nowrap;
-    }
-  }
-  .ph-icon{
-    width: 19px;
-    height: 17px;
-    background: url(../../../static/img/audio.png) no-repeat 0 0;
-    background-size: 100%;
-    cursor: pointer;
-    &:hover{
-      background-image: url(../../../static/img/audio-active.png);
-    }
-  }
-  .ph:not(:last-child){
-    margin-right: 15px;
-  }
-  .ph-icon{
-    margin-left: 5px;
-  }
-  .cn-list{
-    font-size: 14px;
-    li{
-      line-height: 20px;
-      &:not(:last-child){
-        margin-bottom: 5px;
-      }
-    }
   }
 </style>
