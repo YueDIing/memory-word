@@ -51,7 +51,7 @@ export default {
       method: 'get'
     }).then(res => {
       let getData = res.data
-      if (res.status === 200 && getData && getData.code && getData.code === 200) {
+      if (res.status === 200 && getData.code === 4000) {
         let len = getData.data.length
         // let currentWord = this.firstLetter
         let newWord = {}

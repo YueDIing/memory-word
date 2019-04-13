@@ -6,11 +6,12 @@
     if ($res) {
       return $res;
     } else {
-      returnMsg();
+      returnMsg(4001, '', 'data error');
     }
   }
 
   function returnMsg ($code = 400, $data = [],$msg = '') {
+    // header("Content-type: application/json");
     echo json_encode([
       'code' => $code,
       'data' => $data,
@@ -27,6 +28,13 @@
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     $contents = curl_exec($ch);
-    curl_close($ch); //关闭一打开的会话
+    curl_close($ch); //关闭打开的会话
     return $contents;
+  }
+
+  function isEmpty ($table = '', $condition = '') {
+    global $conn;
+    $sql = "SELECT * FROM $table WHERE $condition";
+    $res = $conn -> query($sql);
+    return $res -> fetchAll(PDO::FETCH_ASSOC);
   }

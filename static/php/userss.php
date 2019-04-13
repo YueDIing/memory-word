@@ -8,8 +8,8 @@ header('Access-Control-Allow-Credentials:true');
 	// echo $key;
 	if($str!='nullurl'){
 		$key=  encrypt(str_replace(' ','+',$str),'D','admin');
-		$user = explode('----', $key);
-		echo json_encode([ 'userID' => $user[0] , 'name' => $user[1],'image' => $user[2]]);
+        $user = explode('----', $key);
+		echo json_encode([ 'userID' => $user[0] , 'name' => $user[1], 'image' => $user[2], 'level' => $user[3], 'time' => $user[4]]);
 	}else{
 		echo 'error';
 	}

@@ -2,12 +2,12 @@
 @import url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.css');
 @font-face {
   font-family: 'iconfont';  /* project id 1101085 */
-  src: url('//at.alicdn.com/t/font_1101085_xtti4t6u84.eot');
-  src: url('//at.alicdn.com/t/font_1101085_xtti4t6u84.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.woff2') format('woff2'),
-  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.woff') format('woff'),
-  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_1101085_xtti4t6u84.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_1101085_mdwdolv03a.eot');
+  src: url('//at.alicdn.com/t/font_1101085_mdwdolv03a.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.woff') format('woff'),
+  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.svg#iconfont') format('svg');
 }
 *{
   margin: 0;
@@ -25,7 +25,19 @@ a{
   color: #333;
 }
 input{
+  display: block;
+  min-width: 225px;
+  height: 35px;
+  line-height: 35px;
+  text-indent: 10px;
   border: 1px solid #ccc;
+  outline: none;
+  &:focus{
+    border: 1px solid #1e90ff;
+  }
+}
+input::placeholder{
+  font-size: 12px;
 }
 body{
   background-color: #dfe4ea;
@@ -35,6 +47,7 @@ body{
   justify-content: center;
   align-items: center;
 }
+// layout
 .hide{
   display: none;
 }
@@ -44,6 +57,7 @@ body{
   font-size: 24px;
   color: #1e90ff;
 }
+// icon
 .ph-icon{
   width: 19px;
   height: 17px;
@@ -54,6 +68,7 @@ body{
     background-image: url(../../../static/img/audio-active.png);
   }
 }
+// 用于按钮
 .btns{
   height: 40px;
   line-height: 40px;
@@ -61,16 +76,21 @@ body{
   color: white;
   text-align: center;
   background-color: #1e90ff;
-  transition: opacity .3s;
+  border: none;
   border-radius: 3px;
-}
-.btn-min{
-  .btns();
-  width: 125px;
+  transition: opacity .3s;
   cursor: pointer;
   &:hover{
     opacity: .7;
   }
+}
+.btn-min{
+  width: 125px;
+  .btns();
+}
+.btn-auto{
+  width: 100%;
+  .btns();
 }
 .close{
   position: absolute;
@@ -83,4 +103,9 @@ body{
   &:hover{
     opacity: .7;
   }
+}
+// 状态
+.active.active{
+  color: white !important;
+  background-color: #1e90ff;
 }

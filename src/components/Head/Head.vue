@@ -15,7 +15,7 @@
       </ul>
       <div class="center h-user" v-if="user && JSON.stringify(user) !== '{}'">
         <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
-        <div class="username">{{user.name}}</div>
+        <router-link class="username" to="UserCenter" tag="div">{{ user.name }}</router-link>
       </div>
     </div>
   </div>
@@ -52,14 +52,15 @@ export default {
       let data = res.data
       if (res.status === 200 && data) {
         this.user = res.data
-        console.log(data)
+        console.log('身份：', data)
         Bus.$emit('sendUser', data.userID)
         axios({ // 是否加入数据库
           url: 'http://localhost/Vue_project/Memory-word/static/php/add_user.php',
           method: 'post',
           data: qs.stringify({
             name: data.name,
-            star_id: data.userID
+            star_id: data.userID,
+            level: data.level
           })
         }).then(_res => {
           // console.log(_res.data)
@@ -78,6 +79,9 @@ export default {
         return null
       }
     }
+  },
+  created () {
+    console.log(this.$router)
   }
 }
 </script>

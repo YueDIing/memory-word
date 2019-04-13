@@ -1,6 +1,7 @@
 <?php
   include('./methods.php');
-  $word = getAllWord();
-  if (is_array($word)) {
-    echo returnMsg(200, $word);
+  $allWord = getAllWord();
+
+  if ($allWord) {
+    returnMsg(4000, $allWord, 'success');
   }

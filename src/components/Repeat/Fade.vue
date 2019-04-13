@@ -26,7 +26,7 @@ export default {
   .fade-enter-active, .fade-leave-active{
     transition: opacity .3s;
   }
-  .fade{
+  /* .fade{
     position: absolute;
     top: 0;
     left: 0;
@@ -34,5 +34,5 @@ export default {
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, .6);
-  }
+  } */
 </style>
