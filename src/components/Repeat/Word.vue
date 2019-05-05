@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div class="word">{{item.word_en}}</div>
+    <div class="word title">{{item.word_en}}</div>
     <div class="audio">
       <div class="ph">
         <span>英</span>
@@ -31,7 +31,12 @@ export default {
       required: true
     }
   },
-  name: 'Word'
+  name: 'word',
+  methods: {
+    playSound (url) {
+      this.$emit('sendAudioUrl', url)
+    }
+  }
 }
 </script>
 
@@ -53,7 +58,9 @@ export default {
     margin-bottom: 8px;
     font-size: 14px;
     line-height: 25px;
-    // margin-bottom: 8px;
+    &, & + ul{
+      color: #555;
+    }
   }
   .ph{
     .display_flex();
@@ -75,7 +82,7 @@ export default {
   .cn-list{
     font-size: 14px;
     li{
-      line-height: 20px;
+      line-height: 22px;
       &:not(:last-child){
         margin-bottom: 5px;
       }

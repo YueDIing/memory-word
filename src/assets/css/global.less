@@ -2,12 +2,12 @@
 @import url('//at.alicdn.com/t/font_1101085_aotggqnuwbh.css');
 @font-face {
   font-family: 'iconfont';  /* project id 1101085 */
-  src: url('//at.alicdn.com/t/font_1101085_mdwdolv03a.eot');
-  src: url('//at.alicdn.com/t/font_1101085_mdwdolv03a.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.woff2') format('woff2'),
-  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.woff') format('woff'),
-  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_1101085_mdwdolv03a.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.eot');
+  src: url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.woff') format('woff'),
+  url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.svg#iconfont') format('svg');
 }
 *{
   margin: 0;
@@ -16,6 +16,7 @@
 }
 html, body{
   height: 100%;
+  padding-bottom: 45px;
 }
 ul,li{
   list-style: none;
@@ -51,11 +52,28 @@ body{
 .hide{
   display: none;
 }
+.flex{
+  display: flex;
+}
+// title 正文 14px 正文小 13px 辅助文字 12px
+@f-color: #1e90ff;
 .title-24{
   height: 45px;
   line-height: 45px;
   font-size: 24px;
-  color: #1e90ff;
+  color: @f-color;
+}
+.title-main{
+  line-height: 30px;
+  font-size: 20px;
+}
+.title{
+  line-height: 28px;
+  font-size: 18px;
+}
+.title-min{
+  line-height: 26px;
+  font-size: 16px;
 }
 // icon
 .ph-icon{
@@ -75,6 +93,7 @@ body{
   padding: 0 5px;
   color: white;
   text-align: center;
+  font-size: 14px;
   background-color: #1e90ff;
   border: none;
   border-radius: 3px;
@@ -92,12 +111,23 @@ body{
   width: 100%;
   .btns();
 }
+.btn-delete{
+  .btns();
+  background-color: transparent;
+  color: #f33a3a;
+  transition: background-color .3s, color .3s;
+  &:hover{
+    background-color: #f33a3a;
+    color: white;
+  }
+}
 .close{
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 20px;
+  top: 15px;
+  right: 15px;
+  font-size: 18px;
   font-weight: bold;
+  color: #888;
   border: 5px solid transparent;
   cursor: pointer;
   &:hover{
@@ -108,4 +138,12 @@ body{
 .active.active{
   color: white !important;
   background-color: #1e90ff;
+}
+
+// vue-animate
+.fade-enter, .fade-leave-to{
+  opacity: 0;
+}
+.fade-enter-active, .fade-leave-active{
+  transition: opacity .3s;
 }

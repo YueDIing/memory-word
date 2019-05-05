@@ -1,6 +1,7 @@
 <template>
   <div :class="['t-print', (word && word.status / 1 === 1) ? 'answer-warp' : '']" v-if="word !== null">
     <h3 class="title-24">{{ word.title }} <span>{{ word.time }}</span></h3>
+    <word-audio :path="audioPath" @sendRequireClearUrl="clearUrl"></word-audio>
     <ul class="word-list" v-if="word.status / 1 === 0">
       <li v-for="(item, index) in word.test" :key="index">
         <div>{{ item }}</div>
@@ -9,24 +10,28 @@
     </ul>
     <ul class="answer-list" v-else>
       <li v-for="(item, index) in word.test" :key="item.id || index">
-        <Word :item="item"></Word>
+        <word :item="item" @sendAudioUrl="getAudioUrl"></word>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import Methods from '../../../assets/script/Methods.js'
+import methods from '../../../assets/script/methods.js'
 import axios from 'axios'
-import Word from '../../Repeat/Word'
+// components
+import word from '../../repeat/word'
+import wordAudio from '../../repeat/audio'
 export default {
-  name: 'Tset-print',
+  name: 'testPrint',
   components: {
-    Word
+    word,
+    wordAudio
   },
   data () {
     return {
-      word: null // 一个严重问题, 如果设置默认双面打印, 以及如何添加页眉
+      word: null, // 一个严重问题, 如果设置默认双面打印, 以及如何添加页眉
+      audioPath: null
     }
   },
   mounted () {
@@ -43,10 +48,14 @@ export default {
         if (res.status === 200 && getData.code / 1 === 4000) {
           if (getData.data.status / 1 === 0) {
             getData.data.test = getData.data.test.map(item => {
-              let letter = /^[A-z]+$/i.test(item)
-              // 处理单词意思
+              // 判断单词是否被删除
+              if (!item) {
+                return '单词已被删除'
+              }
+              let letter = /^[A-z]+$/gi.test(item)
+              // 处理单词释义
               if (!letter) {
-                let removeBefore = item.replace(/^[A-z]*\.?\s?/g, '')
+                let removeBefore = item.replace(/^[A-z]*\.?\s?(&\s?.*\.)?/g, '')
                 let split = removeBefore.split(';')
                 let _split = split[0].split('，')
                 // 判断 使用 ; 分割后的第一个元素 再使用 , 分割长度是否大于2
@@ -67,11 +76,16 @@ export default {
             })
           }
           this.word = getData.data
-          console.log(getData.data)
         } else {
-          Methods.getCode(getData.code)
+          methods.getCode(getData.code)
         }
       })
+    },
+    getAudioUrl (url) { // 监听sendAudioUrl触发的事件
+      this.audioPath = url
+    },
+    clearUrl () { // 播放结束清空url
+      this.audioPath = null
     }
   }
 }
@@ -80,11 +94,19 @@ export default {
 <style lang="less" scoped>
   @page{
     size: A4 portrait;
-    margin: 20px 10px;
+    // 底部60防止最后一行的一部分出现在第二页
+    margin: 20px 10px 60px;
   }
   @media print{
     .word-list li{
       break-after: page;
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+    .t-print{
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
     }
   }
   .t-print{

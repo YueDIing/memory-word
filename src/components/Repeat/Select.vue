@@ -11,7 +11,7 @@
       <div class="iconfont s-close closed" @click="remove" v-if="empty">&#xe69e;</div>
       <div class="iconfont s-close direction-down" :style="[status ? rotate : '']">&#xe649;</div>
     </div>
-    <Fade :status="status">
+    <fade :status="status">
       <ul class="r-s-list">
         <li
           v-for="item in data"
@@ -23,13 +23,14 @@
           <span class="r-s-label" v-if="item.label">{{item.label}}</span>
         </li>
       </ul>
-    </Fade>
+    </fade>
   </div>
 </template>
 
 <script>
-import Fade from './Fade'
+import fade from './fade'
 export default {
+  name: 'repeat-select',
   props: {
     data: { // 数据
       type: Array,
@@ -62,9 +63,8 @@ export default {
     prop: 'setVal',
     event: 'change'
   },
-  name: 'Repeat-select',
   components: {
-    Fade
+    fade
   },
   data () {
     return {

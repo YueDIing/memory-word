@@ -1,20 +1,21 @@
 <template>
   <div class="translaiton">
-    <Head :active="1"></Head>
     <div class="tl-content">
       <div class="tl-operation">
         <div class="btn-min tl-translation" @click="change">翻译</div>
       </div>
       <div class="tl-area">
-        <textarea
-          class="tl-enter"
-          placeholder="请输入要翻译的内容 中 <=> 英"
-          v-model="getWord"
-          @input="change"
-        ></textarea>
+        <div class="tl-enter">
+          <textarea
+            placeholder="请输入要翻译的内容 中 <=> 英"
+            v-model="getWord"
+            @input="change"
+          ></textarea>
+        </div>
         <div class="tl-result">
           <div class="tl-r-c" v-if="word && word.status / 1 === 0">
-            <Word :item="word.content"></Word>
+            <word :item="word.content" @sendAudioUrl="getAudioUrl"></word>
+            <word-audio :path="audioUrl" @sendRequireClearUrl="getClearUrl"></word-audio>
             <div class="btn-min tl-btn" @click="addWord">添加到单词库</div>
           </div>
           <div class="tl-r-c" v-else-if="word">
@@ -29,26 +30,28 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import Bus from '../../assets/script/Bus.js'
-import Head from '../Head/Head'
-import Word from '../Repeat/Word'
-import Methods from '../../assets/script/Methods.js'
+import bus from '../../assets/script/bus.js'
+import methods from '../../assets/script/methods.js'
+// components
+import word from '../repeat/word'
+import wordAudio from '../repeat/audio'
 export default {
-  name: 'Translation',
+  name: 'translation',
   data () {
     return {
       getWord: '',
       enterFlag: true,
       word: null,
-      starId: null
+      starId: null,
+      audioUrl: null
     }
   },
   components: {
-    Head,
-    Word
+    word,
+    wordAudio
   },
   created () {
-    Bus.$on('sendUser', res => {
+    bus.$on('sendUser', res => {
       this.starId = res
     })
   },
@@ -65,14 +68,14 @@ export default {
               let getData = res.data
               // console.log(getData)
               if (getData.data.content.error_code) {
-                Methods.popup('数据错误')
+                methods.popup('数据错误')
               } else {
                 if (!getData.data.status) {
-                  getData.data.content.word_en = this.getWord
                   let wordMean = getData.data.content.word_mean // 保存api中的中文翻译
                   delete getData.data.content.word_mean // 删除api中的中文翻译
                   getData.data.content.word_json = wordMean // 重新命名并保存中文翻译
                 }
+                console.log(getData.data)
                 this.word = getData.data
               }
             }
@@ -98,14 +101,20 @@ export default {
           let getData = res.data
           if (res.status === 200 && getData.code / 1 === 4000) {
             if (getData.message.length !== 0) {
-              Methods.popup(getData.message)
+              methods.popup(getData.message)
             }
           }
-          Methods.getCode(getData.code)
+          methods.getCode(getData.code)
         }).catch(error => { console.log(error) })
       } else {
-        Methods.popup('单词是空的')
+        methods.popup('单词是空的')
       }
+    },
+    getAudioUrl (url) { // 获取url, 并传给audio组件
+      this.audioUrl = url
+    },
+    getClearUrl () { // 播放完毕, 清除url
+      this.audioUrl = null
     }
   }
 }
@@ -127,26 +136,27 @@ export default {
   .tl-area{
     display: flex;
     justify-content: space-between;
-  }
-  .tl-enter,
-  .tl-result{
-    width: calc(50% - 20px);
-    padding: 15px;
-    height: 350px;
-    border-radius: 3px;
-    background-color: white;
+    & > div{
+      width: calc(50% - 20px);
+      padding: 15px;
+      height: 350px;
+      border-radius: 3px;
+      background-color: white;
+      box-shadow: 0 0 5px 0 rgba(0, 0, 0, .1);
+    }
     .word{
       font-size: 24px;
     }
   }
-  .tl-enter{
+  .tl-enter textarea{
+    display: block;
+    width: 100%;
+    height: 100%;
     resize: none;
     font-size: 14px;
     outline: none;
-    transition: border-color .3s;
-    &:focus{
-      border: 1px solid #1e90ff;
-    }
+    transition: box-shadow .3s;
+    border-color: transparent;
   }
   .tl-r-c{
     position: relative;

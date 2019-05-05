@@ -1,9 +1,7 @@
 <template>
   <div class="home">
-    <Head></Head>
     <div class="h-content">
-      <audio class="hide" src="" ref="audio" controls autoplay></audio>
-      <!-- <h3 class="title-24">全部单词</h3> -->
+      <word-audio :path="audioPath" @sendRequireClearUrl="clearUrl"></word-audio>
       <ul class="h-classify" v-if="JSON.stringify(firstLetter) !== '{}'">
         <li
           v-for="(item, key, index) in firstLetter" :key="index"
@@ -20,7 +18,7 @@
           ref="wordItem"
           :style="{left: `${(item.x) ? item.x : 0}px`, top: `${(item.y) ? item.y : 0}px`}"
         >
-          <Word :item="item"></Word>
+          <word :item="item" @sendAudioUrl="getAudioUrl"></word>
         </li>
       </ul>
     </div>
@@ -29,20 +27,24 @@
 
 <script>
 import axios from 'axios'
-import Head from '../Head/Head'
-import Word from '../Repeat/Word'
+// components
+import heads from '../head/head'
+import word from '../repeat/word'
+import wordAudio from '../repeat/audio'
 export default {
-  name: 'Home',
+  name: 'home',
   components: {
-    Head,
-    Word
+    heads,
+    word,
+    wordAudio
   },
   data () {
     return {
       showWord: null, // 当前显示单词,
       showIndex: 0, // 当前显示单词分类的的index
       wordHeight: [], // 记录瀑布流的前4个的高度
-      firstLetter: {} // 按首字母字母排序 数据格式： {"#": array}
+      firstLetter: {}, // 按首字母字母排序 数据格式： {"#": array}
+      audioPath: null
     }
   },
   beforeMount () { // 获取数据库中的单词
@@ -82,17 +84,6 @@ export default {
       }
     })
   },
-  mounted () {
-    let audio = this.$refs.audio
-    // 开始播放
-    audio.addEventListener('canplay', () => {
-      console.log('播放开始')
-    }, false)
-    // 结束播放
-    audio.addEventListener('ended', () => {
-      console.log('结束播放')
-    })
-  },
   methods: {
     changeLayout () { // 改变layout为瀑布流域
       this.$nextTick(() => { // Vue 本身回调, 当v-for 渲染完成后执行
@@ -120,29 +111,24 @@ export default {
         }
       })
     },
-    playSound (url) { // 添加audio的url
-      console.log(url)
-      let audio = this.$refs.audio
-      if (audio) {
-        this.$refs.audio.src = url
-      }
-    },
     showCurrent (index, key) {
       this.showIndex = index
       this.showWord = this.firstLetter[key]
       this.wordHeight = [] // 清空之前的瀑布流的数据
       this.changeLayout()
       console.log(this.firstLetter)
+    },
+    getAudioUrl (url) { // 监听sendAudioUrl触发的事件
+      this.audioPath = url
+    },
+    clearUrl () { // 播放结束清空url
+      this.audioPath = null
     }
   }
 }
 </script>
 
 <style lang='less' scoped>
-  .home > div{
-    // 防止滚动条抖动, 100vw(浏览器内部宽度， 包含滚动条宽度) 100%(可用宽度, 不包含滚动条宽度)
-    padding-left: calc(100vw - 100%);
-  }
   .display_flex{
     display: flex;
   }
@@ -157,16 +143,20 @@ export default {
   .h-classify{
     position: fixed;
     z-index: 2;
-    margin-top: 25px;
     padding: 20px 0;
     font-size: 14px;
     background-color: white;
-    transform: translateX(-250%);
+    transform: translateX(-170%);
+    &:hover li{
+      background-color: white;
+      color: #555;
+    }
     li{
       width: 45px;
       height: 32px;
       line-height: 32px;
       text-align: center;
+      color: #555;
       cursor: pointer;
       &:hover{
         background: #1e90ff;
@@ -181,7 +171,6 @@ export default {
   .word-list{
     @value: 25px;
     position: relative;
-    // margin-top: @value;
     .display_flex();
     width: 100%;
     flex-wrap: wrap;
@@ -193,8 +182,5 @@ export default {
       background-color: white;
       border-radius: 3px;
     }
-    /* > li:not(:nth-child(4n)){
-      border-right: 25px solid #dfe4ea;
-    } */
   }
 </style>

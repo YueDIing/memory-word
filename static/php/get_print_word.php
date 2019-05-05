@@ -21,7 +21,6 @@
       $newId = substr($strId, 0, -1);
 
       $words = isEmpty("`word`", "`id` in (" . $newId . ")");
-
       if ($current[0]['status']) {
         // 出卷
         $current[0]['test'] = $words;
@@ -34,7 +33,8 @@
             $cn = json_decode($words[$i]['word_json'], true)[0];
             $newWords[] = $cn;
           } else {
-            $newWords[] = $words[$i]['word_en'];
+//            echo $i . '/--/';
+            $newWords[] = (isset($words[$i]['word_en'])) ? trim($words[$i]['word_en']) : '';
           }
           $current[0]['test'] = $newWords;
         }

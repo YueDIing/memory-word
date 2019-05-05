@@ -12,7 +12,9 @@
       $level = ($getLevel / 1 === 3) ? 0 : 1;
       $insert = "INSERT INTO `user` (`star_id`, `username`, `level`, `token`, `time`) VALUES ('$starId', '$name', '$level', '', $time)";
       if ($conn -> exec($insert)) {
-        returnMsg(200);
+        returnMsg(4000, '', 'success');
       }
+    } else {
+      returnMsg(4000, $res, 'success');
     }
   }

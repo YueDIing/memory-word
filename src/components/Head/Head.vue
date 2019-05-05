@@ -1,21 +1,29 @@
 <template>
   <div class="head">
     <div class="h-content">
-      <div class="center h-logo">LOGO</div>
+      <router-link tag="div" to="/" class="center title-main h-logo"></router-link>
       <ul class="h-menu">
         <router-link class="center"
           :to="item.href"
           v-for="(item, index) in menu"
           :key="index"
           tag="li"
-          :class="[(active === index) ? 'active' : '']"
+          :class="[(item.active) ? 'active' : '']"
+           @click.native="selectCurrent(index)"
         >
           {{item.name}}
         </router-link>
       </ul>
       <div class="center h-user" v-if="user && JSON.stringify(user) !== '{}'">
-        <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
-        <router-link class="username" to="UserCenter" tag="div">{{ user.name }}</router-link>
+        <router-link
+          class="center username"
+          :to="user && user._level / 1 === 0 ? '/userCenter' : ''"
+          tag="div"
+          @click.native="reset"
+        >
+          <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
+          <span>{{ user.name }}</span>
+        </router-link>
       </div>
     </div>
   </div>
@@ -24,35 +32,32 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import Bus from '../../assets/script/Bus.js'
+import Bus from '../../assets/script/bus.js'
 export default {
-  props: {
-    active: {
-      type: Number,
-      default: 0
-    }
-  },
-  name: 'Head',
+  name: 'heads',
   data () {
     return {
+      active: 0,
       menu: [
-        {name: '全部单词', href: '/', icon: ''},
-        {name: '翻译', href: '/Translation', icon: ''},
-        {name: '查看试卷', href: '/Test', icon: ''}
+        { name: '全部单词', href: '/', icon: '', active: true },
+        { name: '翻译', href: '/Translation', icon: '', active: false },
+        { name: '查看试卷', href: '/Test', icon: '', active: false }
       ],
       user: null
     }
   },
   beforeMount () {
     // 获取用户信息
+    this.$route.query.key = '%2Fr0qngP9ySfZO3zuDkFnARuV8le7WzUbus013UdaMD4zcb4PnY%2FS3IInHShTDxz%2F9M1DXWx2b7GjQYYTKUvc'
+    // this.$route.query.key = '%20ex7lgKpniDZP3zuDkFrAQmUwEdwzYwb%2Fo1%2Fm19Oejkfcq0znsGFjYN5XWEZS1f%2F681DQmxpcq2oXIcfKUvaZWh%20'
     axios({
-      url: 'http://localhost/Vue_project/Memory-word/static/php/userss.php?key=' + this.getUrlParameter('key') + '',
+      url: 'http://localhost/Vue_project/Memory-word/static/php/userss.php?key=' + this.$route.query.key + '',
       method: 'get'
     }).then(res => {
       let data = res.data
       if (res.status === 200 && data) {
         this.user = res.data
-        console.log('身份：', data)
+        // console.log('身份：', data)
         Bus.$emit('sendUser', data.userID)
         axios({ // 是否加入数据库
           url: 'http://localhost/Vue_project/Memory-word/static/php/add_user.php',
@@ -64,24 +69,28 @@ export default {
           })
         }).then(_res => {
           // console.log(_res.data)
+          const _getData = _res.data
+          if (_res.status === 200 && _getData.code / 1 === 4000 && _getData.data) {
+            this.user._level = _getData.data.level
+            // 将用户信息保存到bus中, 让其他组件获取用户信息
+            Bus.$emit('userInfo', this.user)
+          }
         }).catch(_error => { console.log(_error) })
       }
     }).catch(error => { console.log(error) })
   },
   methods: {
-    // 获取浏览器路径后的参数
-    getUrlParameter (name) {
-      let reg = new RegExp(`(^|&)${name}=(([^&]*)(&|$))`)
-      let r = location.search.substr(1).match(reg)
-      if (r != null) {
-        return unescape(r[2])
-      } else {
-        return null
+    selectCurrent (index) {
+      let active = this.active
+      this.menu[active].active = false
+      this.menu[index].active = true
+      this.active = index
+    },
+    reset () { // 取消导航的选中状态
+      if (this.user && this.user._level / 1 === 0) {
+        this.menu[this.active].active = false
       }
     }
-  },
-  created () {
-    console.log(this.$router)
   }
 }
 </script>
@@ -95,7 +104,11 @@ export default {
     height: 65px;
     margin-bottom: 50px;
     background-color: white;
-    // box-shadow: 0 -2px 5px 0 rgb(0, 0, 0, .1);
+    padding-left: calc(100vw - 100%);
+  }
+  .h-logo{
+    background: url(../../../static/img/logo_v2.png) no-repeat center;
+    background-size: auto 80%;
   }
   .h-content{
     display: flex;
@@ -110,6 +123,7 @@ export default {
     margin-right: @value;
     font-weight: bold;
     color: #1e90ff;
+    cursor: pointer;
   }
   .h-menu{
     display: flex;
@@ -140,13 +154,20 @@ export default {
     &:hover{
       color: #1e90ff;
     }
-    & > img{
+  }
+  .username{
+    height: 100%;
+    & img{
       display: block;
       width: 40px;
       height: 40px;
       border-radius: 20px;
-      margin-right: 15px;
-      // box-shadow: 0 0 5px 0 rgba(0, 0, 0, .2);
+    }
+    & span {
+      display: block;
+      line-height: 65px;
+      padding: 0 15px;
+      height: 100%;
     }
   }
 </style>

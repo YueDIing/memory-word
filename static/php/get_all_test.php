@@ -10,6 +10,4 @@
       $res[$i]['time'] = date("Y-m-d", $res[$i]['time']);
     }
     returnMsg(4000, $res, 'get test success');
-  } else {
-    returnMsg(4004, '', 'error');
   }
