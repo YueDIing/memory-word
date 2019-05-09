@@ -70,12 +70,14 @@ export default {
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, .4);
   }
   .arrow-top{
-    width: 0;
-    height: 0;
-    line-height: 0;
+    @border: 9px solid transparent;
+    @resize: 0;
+    width: @resize;
+    height: @resize;
+    line-height: @resize;
     border-bottom: 12px solid #1e90ff;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
+    border-left: @border;
+    border-right: @border;
   }
 }
 </style>

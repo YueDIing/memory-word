@@ -1,26 +1,32 @@
 <template>
   <div class="manage-classify">
     <div class="classify-wrap">
-      <div class="classify-content">
-        <div class="add-classify">
+      <popup :title="'添加分类'" :status="status" @closed="toggleWindows">
+        <div class="enter-classify">
           <input type="text" class="classify-name" v-model="name" placeholder="Enter classify name">
-          <div class="btns" @click="addClassify">Add classify</div>
+          <div class="btns-main" @click="addClassify">提交</div>
         </div>
-        <div class="classify-list-head">
-          <div class="c-list-position">Position</div>
-          <div class="c-list-name">Name</div>
-          <div class="c-list-num">Num</div>
-          <div class="c-list-time">Time</div>
-          <div class="c-list-operation">Operation</div>
+      </popup>
+      <div class="classify-content">
+        <div class="justify">
+          <h3 class="title">分类管理</h3>
+          <div class="btns-main" @click="toggleWindows">添加分类</div>
         </div>
-        <ul class="classify-list">
+        <div class="list-head classify-list-head">
+          <div class="c-list-position">序号</div>
+          <div class="c-list-name">分类名称</div>
+          <div class="c-list-num">数量</div>
+          <div class="c-list-time">时间</div>
+          <div class="c-list-operation">操作</div>
+        </div>
+        <ul class="list-content classify-list">
           <li v-for="(item, index) in allClassify" :key="item.id || index">
             <div class="c-list-position">{{index + 1}}</div>
             <div class="c-list-name">{{item.type_name}}</div>
             <div class="c-list-num">{{item.num}}</div>
             <div class="c-list-time">{{item.time}}</div>
             <div class="c-list-operation">
-              <div class="iconfont btn-delete" @click="deleteClassify(item.id, index)">&#xe641;</div>
+              <div class="iconfont btns-danger" @click="deleteClassify(item.id, index)" v-if="item.id / 1 !== 1">&#xe641;</div>
             </div>
           </li>
         </ul>
@@ -32,24 +38,32 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import methods from '../../../assets/script/methods'
+import methods from '@public/script/methods'
 // components
+import popup from '../../repeat/popup'
 export default {
   name: 'classifyManage',
   data () {
     return {
       allClassify: null,
-      name: null
+      name: null,
+      status: false
     }
+  },
+  components: {
+    popup
   },
   created () {
     this.getAllClassify()
   },
   methods: {
+    toggleWindows () {
+      this.status = !this.status
+    },
     getAllClassify () {
       axios({
         methods: 'get',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/get_all_classify.php'
+        url: `${methods.path}/get_all_classify.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
@@ -62,13 +76,15 @@ export default {
       if (name && name.length > 0) {
         axios({
           method: 'post',
-          url: 'http://localhost/Vue_project/Memory-word/static/php/add_classify.php',
+          url: `${methods.path}/add_classify.php`,
           data: qs.stringify({
             name
           })
         }).then(res => {
           let getData = res.data
           if (res.status === 200 && getData.code / 1 === 4000) {
+            this.name = null
+            this.status = false
             this.getAllClassify()
           } else {
             methods.getCode(getData.code)
@@ -81,7 +97,7 @@ export default {
     deleteClassify (id, index) {
       axios({
         method: 'post',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/delete_classify.php',
+        url: `${methods.path}/delete_classify.php`,
         data: qs.stringify({
           id
         })
@@ -100,40 +116,33 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import url("../../../assets/css/public");
 .classify-wrap{
   width: 100%;
 }
 .classify-content{
   padding: 15px 30px 30px;
-  border-radius: 3px;
-  background-color: white;
-}
-.add-classify{
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0 25px;
-  .btns{
-    flex: 2;
-  }
+  border-radius: @border-radius;
+  background-color: @color-white;
 }
 .classify-name{
   flex: 8;
   height: 40px;
   margin-right: 25px;
-  border-radius: 3px;
+  border-radius: @border-radius;
   line-height: 40px;
 }
 .classify-list-head{
   display: flex;
   text-align: center;
-  height: 45px;
-  line-height: 45px;
-  font-weight: bold;
-  color: #1e90ff;
-  border-top: 1px solid #dfe4ea;
-  border-bottom: 1px solid #dfe4ea;
   & > div{
     flex: 2;
+  }
+}
+.enter-classify{
+  input{
+    width: 100%;
+    margin-bottom: 35px;
   }
 }
 .classify-list{
@@ -142,20 +151,15 @@ export default {
     height: 45px;
     line-height: 45px;
     text-align: center;
-    cursor: pointer;
-    &:nth-child(2n){
-      background-color: #eee;
-    }
-    & ~ li:hover{
-      background-color: #dfe4ea;
-    }
     & > div{
       flex: 2;
     }
   }
 }
-.btn-delete{
+.btns-danger{
+  display: block;
   height: 45px;
   line-height: 45px;
+  padding: 0;
 }
 </style>

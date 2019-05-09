@@ -19,6 +19,7 @@
 
 <script>
 import './assets/css/global.less'
+// import bus from './assets/script/bus'
 // components
 import backTop from './components/repeat/backTop'
 import heads from './components/head/head'
@@ -27,11 +28,13 @@ export default {
   components: {
     backTop,
     heads
+  },
+  created () {
   }
 }
 </script>
 
-<style>
+<style lang='less'>
 [v-cloak]{
   display: none !important;
 }

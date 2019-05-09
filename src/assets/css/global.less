@@ -9,6 +9,11 @@
   url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.ttf') format('truetype'),
   url('//at.alicdn.com/t/font_1101085_qhuatcx0asd.svg#iconfont') format('svg');
 }
+// less public variable
+@import url('./public');
+.color () {
+ color: @color;
+}
 *{
   margin: 0;
   padding: 0;
@@ -34,7 +39,7 @@ input{
   border: 1px solid #ccc;
   outline: none;
   &:focus{
-    border: 1px solid #1e90ff;
+    border: 1px solid @color;
   }
 }
 input::placeholder{
@@ -42,6 +47,9 @@ input::placeholder{
 }
 body{
   background-color: #dfe4ea;
+}
+.flex{
+  display: flex;
 }
 .center{
   display: flex;
@@ -52,17 +60,12 @@ body{
 .hide{
   display: none;
 }
-.flex{
+.justify{
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 // title 正文 14px 正文小 13px 辅助文字 12px
-@f-color: #1e90ff;
-.title-24{
-  height: 45px;
-  line-height: 45px;
-  font-size: 24px;
-  color: @f-color;
-}
 .title-main{
   line-height: 30px;
   font-size: 20px;
@@ -77,49 +80,56 @@ body{
 }
 // icon
 .ph-icon{
+  @audioUrl: '../../../static/img/';
   width: 19px;
   height: 17px;
-  background: url(../../../static/img/audio.png) no-repeat 0 0;
+  background: url("@{audioUrl}audio.png") no-repeat 0 0;
   background-size: 100%;
   cursor: pointer;
   &:hover{
-    background-image: url(../../../static/img/audio-active.png);
+    background-image: url("@{audioUrl}audio-active.png");
   }
 }
-// 用于按钮
-.btns{
-  height: 40px;
-  line-height: 40px;
-  padding: 0 5px;
-  color: white;
-  text-align: center;
+// list
+.list-head{
+  padding: 15px 0;
+  color: #1e90ff;
+  border-top: 1px solid #dfe4ea;
+  border-bottom: 1px solid #dfe4ea;
+}
+.list-content > *{
+  line-height: 45px;
   font-size: 14px;
-  background-color: #1e90ff;
+  border-radius: @border-radius;
+  &:nth-child(2n){
+    background-color:#f1f1f1;
+  }
+  &:hover{
+    background-color: #DFDFDF;
+  }
+}
+// button
+.btns (@bg-color:@color) {
+  display: inline-block;
+  min-width: 125px;
+  padding: 10px 10px;
+  color: white;
+  font-size: 14px;
+  text-align: center;
   border: none;
-  border-radius: 3px;
+  border-radius: @border-radius;
+  background-color: @bg-color;
   transition: opacity .3s;
   cursor: pointer;
   &:hover{
     opacity: .7;
   }
 }
-.btn-min{
-  width: 125px;
-  .btns();
+.btns-main {
+  .btns()
 }
-.btn-auto{
-  width: 100%;
-  .btns();
-}
-.btn-delete{
-  .btns();
-  background-color: transparent;
-  color: #f33a3a;
-  transition: background-color .3s, color .3s;
-  &:hover{
-    background-color: #f33a3a;
-    color: white;
-  }
+.btns-danger{
+  .btns(@color-danger);
 }
 .close{
   position: absolute;
@@ -137,9 +147,8 @@ body{
 // 状态
 .active.active{
   color: white !important;
-  background-color: #1e90ff;
+  background-color: @color;
 }
-
 // vue-animate
 .fade-enter, .fade-leave-to{
   opacity: 0;

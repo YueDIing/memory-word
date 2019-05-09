@@ -18,6 +18,13 @@ export default {
   name: 'userCenter',
   components: {
     usermenu
+  },
+  beforeCreate () {
+    const user = this.$store.user
+    // 如果没有权限返回首页
+    if (user && user._level / 1) {
+      this.$router.push('/')
+    }
   }
 }
 </script>

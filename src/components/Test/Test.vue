@@ -1,7 +1,7 @@
 <template>
   <div class="test">
     <div class="t-content">
-      <div class="t-list-head">
+      <div class="list-head t-list-head">
         <div class="t-position">Position</div>
         <div class="t-title">Title</div>
         <div class="t-number">Number</div>
@@ -9,7 +9,7 @@
         <div class="t-time">Time</div>
         <div class="t-operation">Operation</div>
       </div>
-      <ul class="t-list" v-if="allTest && allTest.length">
+      <ul class="list-content t-list" v-if="allTest && allTest.length">
         <li v-for="(item, index) in allTest" :key="item.id || index">
           <div class="t-position">{{ allTest.length - index}}</div>
           <div class="t-title">{{ item.title }}</div>
@@ -17,7 +17,7 @@
           <div class="t-status">{{ item.status  / 1? '已结束' : '进行中' }}</div>
           <div class="t-time">{{item.time}}</div>
           <div class="t-operation">
-            <router-link class="select" :to="{path: 'TestPrint', query: {id: item.id}}" v-if="item.status / 1 === 1">查看答案</router-link>
+            <router-link class="select" :to="{path: 'userCenter/testPrint', query: {id: item.id}}" v-if="item.status / 1 === 1">查看答案</router-link>
             <div class="select nodrop" v-else>查看答案</div>
           </div>
         </li>
@@ -28,8 +28,8 @@
 
 <script>
 import axios from 'axios'
-import Bus from '../../assets/script/bus.js'
-import Methods from '../../assets/script/methods.js'
+import Bus from '@public/script/bus.js'
+import methods from '@public/script/methods.js'
 // 组件
 import repeatSelect from '../repeat/select'
 import popup from '../repeat/popup'
@@ -61,13 +61,13 @@ export default {
     Bus.$on('sendUser', res => {
       axios({
         methdo: 'get',
-        url: `http://localhost/Vue_project/Memory-word/static/php/query_user.php?id=${res}`
+        url: `${methods.path}/query_user.php?id=${res}`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code === 4000) {
           this.user = getData.data
         } else {
-          Methods.getCode(getData.code)
+          methods.getCode(getData.code)
         }
       })
     })
@@ -81,13 +81,13 @@ export default {
     getAllTest () { // 获取全部试卷
       axios({
         method: 'get',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/get_all_test.php'
+        url: `${methods.path}/get_all_test.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
           this.allTest = getData.data
         } else {
-          Methods.getCode(getData.code)
+          methods.getCode(getData.code)
         }
       })
     }
@@ -96,15 +96,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url('../../assets/css/public');
   .test{
     width: 100%;
   }
   .t-content{
     width: 1330px;
-    margin: 55px auto 0 auto;
-    border-radius: 3px;
+    border-radius: @border-radius;
     padding: 35px 30px 45px 30px;
-    background-color: white;
+    background-color: @color-white;
   }
   .t-head{
     display: flex;
@@ -119,13 +119,13 @@ export default {
     top: 50%;
     left: 50%;
     width: 500px;
-    background-color: white;
-    border-radius: 3px;
+    background-color: @color-white;
+    border-radius: @border-radius;
     transform: translate(-50%, -50%);
     h3{
       margin-bottom: 25px;
       font-size: 20px;
-      color: #1e90ff;
+      color: @color;
     }
   }
   .t-enter{
@@ -135,31 +135,14 @@ export default {
   }
   .t-list-head{
     display: flex;
-    padding-bottom: 15px;
     text-align: center;
-    font-weight: bold;
-    color: #1e90ff;
-    border-bottom: 1px solid #dfe4ea;
   }
   .t-list{
-    background-color: white;
-    border-radius: 3px;
+    background-color: @color-white;
+    border-radius: @border-radius;
     & > li{
       display: flex;
       text-align: center;
-    }
-    & > li{
-      font-size: 14px;
-      line-height: 45px;
-      &:nth-child(2n){
-        background-color: #eee;
-      }
-      &:hover{
-        background-color: #dfe4ea;
-      }
-    }
-    & > li:last-child{
-      border-bottom: 1px solid #dfe4ea;
     }
   }
   .t-position,
@@ -189,14 +172,15 @@ export default {
     cursor: pointer;
     transition: background-color .3s, color .3s;
     &:hover{
-      color: white;
-      background-color: #1e90ff;
+      color: @color-white;
+      background-color: @color;
     }
   }
   .nodrop{
-    color: #ccc;
+    @color-ccc: #ccc;
+    color: @color-ccc;
     &:hover{
-      color: #ccc;
+      color: @color-ccc;
       background-color: transparent;
     }
   }

@@ -2,22 +2,23 @@
   <div class="word-manage">
     <div class="test-manage">
       <div class="all-test">
-        <div class="t-head">
-          <div class="btn-min"
+        <div class="justify t-head">
+          <h3 class="title">试卷管理</h3>
+          <div class="btns-main"
             @click="change"
           >New Test</div>
         </div>
-        <ul class="t-list-head">
+        <ul class="list-head t-list-head">
           <li>
-            <div class="t-position">Position</div>
-            <div class="t-title">Title</div>
-            <div class="t-number">Number</div>
-            <div class="t-status">Status</div>
-            <div class="t-time">Time</div>
-            <div class="t-operation">Operation</div>
+            <div class="t-position">序号</div>
+            <div class="t-title">标题</div>
+            <div class="t-number">数量</div>
+            <div class="t-status">状态</div>
+            <div class="t-time">时间</div>
+            <div class="t-operation">操作</div>
           </li>
         </ul>
-        <ul class="t-list" v-if="allTest && allTest.length">
+        <ul class="list-content t-list" v-if="allTest && allTest.length">
           <li v-for="(item, index) in allTest" :key="item.id || index">
             <div class="t-position">{{ allTest.length - index}}</div>
             <div class="t-title">{{ item.title }}</div>
@@ -25,7 +26,6 @@
             <div class="t-status">{{ item.status  / 1? '已结束' : '进行中' }}</div>
             <div class="t-time">{{item.time}}</div>
             <div class="t-operation" v-if="user && user.level / 1 !== 0">
-              <!-- <router-link class="select" :to="{path: 'TestPrint', query: {id: item.id}}" v-if="item.status / 1 === 1">查看答案</router-link> -->
               <router-link class="select" :to="{path: 'TestPrint', query: {id: item.id}}" v-if="item.status / 1 === 1">查看答案</router-link>
               <div class="select" v-else>查看答案</div>
             </div>
@@ -53,7 +53,7 @@
             :placeholder="'请选择数量'"
             v-model="newTest.number"
           ></repeat-select>
-          <button class="btn-auto" @click="submitTest">添加</button>
+          <button class="btns-main" @click="submitTest">添加</button>
         </div>
       </div>
     </popup>
@@ -63,8 +63,7 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import methods from '../../../assets/script/methods'
-import Bus from '../../../assets/script/bus'
+import methods from '@public/script/methods'
 // 组件
 import repeatSelect from '../../repeat/select'
 import popup from '../../repeat/popup'
@@ -88,35 +87,24 @@ export default {
         { id: '3', val: '70' },
         { id: '4', val: '80' },
         { id: '5', val: '90' },
-        { id: '6', val: '100' }
+        { id: '6', val: '100' },
+        { id: '6', val: '120' },
+        { id: '6', val: '140' },
+        { id: '6', val: '160' },
+        { id: '6', val: '180' },
+        { id: '6', val: '200' }
       ]
     }
   },
   beforeMount () {
-    Bus.$on('sendUser', res => {
-      axios({
-        methdo: 'get',
-        url: `http://localhost/Vue_project/Memory-word/static/php/query_user.php?id=${res}`
-      }).then(res => {
-        let getData = res.data
-        if (res.status === 200 && getData.code === 4000) {
-          this.user = getData.data
-          if (getData.data.level / 1 === 0) {
-            // 获取所有试卷分类
-            this.getTestType()
-          }
-        } else {
-          methods.getCode(getData.code)
-        }
-      })
-    })
+    this.getTestType()
     this.getAllTest()
   },
   methods: {
     getAllTest () { // 获取全部试卷
       axios({
         method: 'get',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/get_all_test.php'
+        url: `${methods.path}/get_all_test.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
@@ -137,7 +125,7 @@ export default {
     getTestType () { // 获取试卷类型
       axios({
         mehtod: 'get',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/get_test_type.php'
+        url: `${methods.path}/get_test_type.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
@@ -154,7 +142,7 @@ export default {
       if (parameter.title !== '' && parameter.number !== '') {
         axios({
           method: 'post',
-          url: 'http://localhost/Vue_project/Memory-word/static/php/add_test.php',
+          url: `${methods.path}/add_test.php`,
           data: qs.stringify({
             class_id: this.newTest.title.id,
             number: this.newTest.number.val
@@ -177,7 +165,7 @@ export default {
     outTest (id, index) { // 出卷
       axios({
         method: 'post',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/out_test.php',
+        url: `${methods.path}/out_test.php`,
         data: qs.stringify({ id: id })
       }).then(res => {
         let getData = res.data
@@ -191,6 +179,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url("../../../assets/css/public");
   .border-radius{
     border-radius: 3px;
   }
@@ -200,7 +189,7 @@ export default {
   .all-test{
     padding: 15px 30px 30px;
     .border-radius();
-    background-color: white;
+    background-color: @color-white;
   }
   .t-head{
     display: flex;
@@ -209,39 +198,15 @@ export default {
     }
   }
   .t-list-head{
-    color: #1e90ff;
-    font-weight: bold;
-    background-color: white;
-    border-radius: 3px;
     & > li{
       display: flex;
       text-align: center;
-      padding: 15px 0;
-      font-weight: bold;
-      color: #1e90ff;
-      border-bottom: 1px solid #dfe4ea;
-      border-top: 1px solid #dfe4ea;
     }
   }
   .t-list{
-    background-color: white;
-    border-radius: 3px;
-    & > li{
+    li{
       display: flex;
       text-align: center;
-    }
-    & > li{
-      font-size: 14px;
-      line-height: 45px;
-      &:nth-child(2n + 1){
-        background-color: #eee;
-      }
-      &:hover{
-        background-color: #dfe4ea;
-      }
-    }
-    & > li:last-child{
-      border-bottom: 1px solid #dfe4ea;
     }
   }
   .t-position,
@@ -271,14 +236,18 @@ export default {
     cursor: pointer;
     transition: background-color .3s, color .3s;
     &:hover{
-      color: white;
-      background-color: #1e90ff;
+      color: @color-white;
+      background-color: @color;
     }
   }
+  .btns-main{
+    margin-top: 20px;
+  }
   .nodrop{
-    color: #ccc;
+    @color-ccc: #ccc;
+    color: @color-ccc;
     &:hover{
-      color: #ccc;
+      color: @color-ccc;
       background-color: transparent;
     }
   }

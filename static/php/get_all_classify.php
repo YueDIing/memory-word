@@ -2,7 +2,7 @@
   include('./conn.php');
   include('./methods.php');
 
-  $query = "SELECT * FROM `test_type`";
+  $query = "SELECT * FROM `test_type` ORDER BY `time` DESC";
   $res = $conn -> query($query) -> fetchAll(PDO::FETCH_ASSOC);
   if (isset($res)) {
     $index = 0;

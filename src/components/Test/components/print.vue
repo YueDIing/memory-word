@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import methods from '../../../assets/script/methods.js'
+import methods from '@public/script/methods.js'
 import axios from 'axios'
 // components
 import word from '../../repeat/word'
@@ -42,7 +42,7 @@ export default {
       let tid = this.$route.query.id
       axios({
         method: 'get',
-        url: `http://localhost/Vue_project/Memory-word/static/php/get_print_word.php?tid=${tid}`
+        url: `${methods.path}/get_print_word.php?tid=${tid}`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
@@ -95,7 +95,7 @@ export default {
   @page{
     size: A4 portrait;
     // 底部60防止最后一行的一部分出现在第二页
-    margin: 20px 10px 60px;
+    margin: 20px 10px 80px;
   }
   @media print{
     .word-list li{
@@ -105,7 +105,7 @@ export default {
     }
     .t-print{
       margin: 0;
-      padding: 0;
+      // padding: 0;
       background-color: transparent;
     }
   }
@@ -150,7 +150,7 @@ export default {
   }
   .answer-list{
     display: grid;
-    grid-template-columns: repeat(4, 23.5%);
+    grid-template-columns: repeat(3, 31.83333%);
     justify-content: space-between;
     li{
       padding: 15px;

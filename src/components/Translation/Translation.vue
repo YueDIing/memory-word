@@ -2,7 +2,7 @@
   <div class="translaiton">
     <div class="tl-content">
       <div class="tl-operation">
-        <div class="btn-min tl-translation" @click="change">翻译</div>
+        <button class="btns-main tl-translation" @click="change">翻译</button>
       </div>
       <div class="tl-area">
         <div class="tl-enter">
@@ -16,7 +16,7 @@
           <div class="tl-r-c" v-if="word && word.status / 1 === 0">
             <word :item="word.content" @sendAudioUrl="getAudioUrl"></word>
             <word-audio :path="audioUrl" @sendRequireClearUrl="getClearUrl"></word-audio>
-            <div class="btn-min tl-btn" @click="addWord">添加到单词库</div>
+            <!-- <div class="btns-main tl-btn" @click="addWord">添加到单词库</div> -->
           </div>
           <div class="tl-r-c" v-else-if="word">
             {{word.content.out}}
@@ -30,8 +30,8 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import bus from '../../assets/script/bus.js'
-import methods from '../../assets/script/methods.js'
+import bus from '@public/script/bus.js'
+import methods from '@public/script/methods.js'
 // components
 import word from '../repeat/word'
 import wordAudio from '../repeat/audio'
@@ -61,14 +61,13 @@ export default {
         this.enterFlag = false
         setTimeout(() => {
           axios({
-            url: `http://localhost/Vue_project/Memory-word/static/php/translation.php?word=${this.getWord}`,
+            url: `${methods.path}/translation.php?word=${this.getWord}`,
             method: 'get'
           }).then(res => {
             if (res.status === 200 && res.data.code / 1 === 4000) {
               let getData = res.data
-              // console.log(getData)
               if (getData.data.content.error_code) {
-                methods.popup('数据错误')
+                // methods.popup('数据错误')
               } else {
                 if (!getData.data.status) {
                   let wordMean = getData.data.content.word_mean // 保存api中的中文翻译
@@ -92,7 +91,7 @@ export default {
       if (word && starId) {
         word.content.star_id = starId
         axios({
-          url: 'http://localhost/Vue_project/Memory-word/static/php/add_word.php',
+          url: `${methods.path}/add_word.php`,
           method: 'post',
           data: qs.stringify({
             word: word.content
@@ -121,13 +120,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url('../../assets/css/public');
   .translaiton{
     width: 100%;
     height: 100%;
   }
   .tl-content{
     width: 1330px;
-    // padding-top: 55px;
     margin: 0 auto;
   }
   .tl-operation{
@@ -140,7 +139,7 @@ export default {
       width: calc(50% - 20px);
       padding: 15px;
       height: 350px;
-      border-radius: 3px;
+      border-radius: @border-radius;
       background-color: white;
       box-shadow: 0 0 5px 0 rgba(0, 0, 0, .1);
     }

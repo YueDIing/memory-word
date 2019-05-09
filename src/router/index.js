@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import bus from '../assets/script/bus'
+// import bus from '../assets/script/bus'
+// import store from '../vuex/index'
 
 // components
 import home from '../components/home/home'
@@ -17,7 +18,6 @@ import classifyManage from '../components/head/components/classifymanage'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
   routes: [
     {
       path: '/',
@@ -46,7 +46,22 @@ export default new Router({
       path: '/userCenter',
       name: 'userCenter',
       component: userCenter,
-      redirect: '/userCenter/wordManage',
+      redirect: '/userCenter/testmanage',
+      /**
+       * Vue Router 钩子函数
+       * @param {Object} target 目标路由
+       * @param {Object} origin 源路由
+       * @param {function} next 回调, 进入下一个路由
+       */
+      /* beforeEnter (target, origin, next) {
+        // 路由拦截, 防止没有权限进入管理页
+        const user = store.state.user
+        if (user && user._level / 1 === 0) {
+          next()
+        } else {
+          next('/')
+        }
+      }, */
       children: [
         { // 单词管理
           path: 'wordManage',
@@ -68,27 +83,7 @@ export default new Router({
           name: 'testprint',
           component: testprint
         }
-      ],
-      /**
-       * Vue Router 钩子函数
-       * @param {Object} target 目标路由
-       * @param {Object} origin 源路由
-       * @param {function} next 回调, 进入下一个路由
-       */
-      beforeEnter (target, origin, next) {
-        // 路由拦截, 防止没有权限进入管理页
-        if (target.path.indexOf('userCenter') > -1) {
-          console.log(bus)
-          bus.$on('userInfo', res => {
-            console.log(res)
-            if (res._level / 1 !== 0) {
-              next('/')
-            }
-            bus.$off('userInfo')
-          })
-        }
-        next()
-      }
+      ]
     }
   ]
 })

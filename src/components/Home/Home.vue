@@ -27,6 +27,7 @@
 
 <script>
 import axios from 'axios'
+import methods from '@public/script/methods'
 // components
 import heads from '../head/head'
 import word from '../repeat/word'
@@ -49,7 +50,7 @@ export default {
   },
   beforeMount () { // 获取数据库中的单词
     axios({
-      url: 'http://localhost/Vue_project/Memory-word/static/php/getAllWord.php',
+      url: `${methods.path}/getAllWord.php`,
       method: 'get'
     }).then(res => {
       let getData = res.data
@@ -129,6 +130,7 @@ export default {
 </script>
 
 <style lang='less' scoped>
+  @import url('../../assets/css/public');
   .display_flex{
     display: flex;
   }
@@ -141,31 +143,33 @@ export default {
     padding: 0 15px;
   }
   .h-classify{
+    @color-555: #555;
     position: fixed;
     z-index: 2;
     padding: 20px 0;
     font-size: 14px;
-    background-color: white;
+    background-color: @color-white;
     transform: translateX(-170%);
     &:hover li{
-      background-color: white;
-      color: #555;
+      background-color: @color-white;
+      color: @color-555;
     }
     li{
+      @height: 32px;
       width: 45px;
-      height: 32px;
-      line-height: 32px;
+      height: @height;
+      line-height: @height;
       text-align: center;
-      color: #555;
+      color: @color-555;
       cursor: pointer;
       &:hover{
-        background: #1e90ff;
-        color: white;
+        background: @color;
+        color: @color-white;
       }
     }
     .current{
-      background-color: #1e90ff;
-      color: white;
+      background-color: @color;
+      color: @color-white;
     }
   }
   .word-list{
@@ -179,8 +183,8 @@ export default {
       width: calc(1225px / 4);
       margin-bottom: @value;
       padding: 15px;
-      background-color: white;
-      border-radius: 3px;
+      background-color: @color-white;
+      border-radius: @border-radius;
     }
   }
 </style>

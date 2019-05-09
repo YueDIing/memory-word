@@ -23,11 +23,20 @@ export default {
     return {
       active: 0,
       menu: [
-        { id: 0, content: '单词管理', path: '/usercenter', icon: '&#xe624;', active: true },
-        { id: 1, content: '试卷管理', path: '/usercenter/testmanage', icon: '&#xe6ca;', active: false },
+        { id: 0, content: '试卷管理', path: '/usercenter/testmanage', icon: '&#xe6ca;', active: false },
+        { id: 1, content: '单词管理', path: '/usercenter/wordManage', icon: '&#xe624;', active: true },
         { id: 2, content: '分类管理', path: '/usercenter/classifyManage', icon: '&#xe600;', active: false }
       ]
     }
+  },
+  beforeMount () {
+    // 当前router高亮
+    let name = (this.$route.name.indexOf('/') > -1) ? this.$route.name : `/${this.$route.name}`
+    this.menu.forEach(item => {
+      if (item.path.indexOf(name) > -1) {
+        this.selectCurrent(item.id)
+      }
+    })
   },
   methods: {
     selectCurrent (index) {
@@ -41,23 +50,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url('../../../assets/css/public');
   .u-list{
     padding: 15px 0;
     border-radius: 3px;
-    background-color: white;
+    background-color: @color-white;
   }
   li{
     line-height: 35px;
     padding: 5px 15px;
     font-size: 14px;
-    color: #1e90ff;
+    color: @color;
     cursor: pointer;
     &:not(:last-child){
       border-bottom: 1px solid #eee;
     }
     &:hover{
-      color: white;
-      background-color: #1e90ff;
+      color: @color-white;
+      background-color: @color;
     }
   }
   .menu-content{

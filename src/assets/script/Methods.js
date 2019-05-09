@@ -1,4 +1,5 @@
 export default{
+  path: 'http://10.21.40.160/dist/static/php', // api public path
   popup (msg = '') {
     alert(msg)
   },

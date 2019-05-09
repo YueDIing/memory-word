@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <div class="word title">{{item.word_en}}</div>
-    <div class="audio">
+    <div class="audio" v-if="item.ph_en || item.ph_am">
       <div class="ph">
         <span>英</span>
         <div class="en" v-if="item.ph_en">[{{item.ph_en}}]</div>

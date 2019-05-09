@@ -5,6 +5,9 @@
   $id = $_POST['id'] ?? null;
 
   if (isset($id)) {
+      if ($id / 1 === 1) {
+        exit;
+      }
       $query = "SELECT * FROM `test_type` WHERE `id` = $id";
       $res = $conn -> query($query) -> fetch();
       if (isset($res)) {

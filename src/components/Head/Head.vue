@@ -9,7 +9,7 @@
           :key="index"
           tag="li"
           :class="[(item.active) ? 'active' : '']"
-           @click.native="selectCurrent(index)"
+          @click.native="toggleRouter"
         >
           {{item.name}}
         </router-link>
@@ -18,8 +18,7 @@
         <router-link
           class="center username"
           :to="user && user._level / 1 === 0 ? '/userCenter' : ''"
-          tag="div"
-          @click.native="reset"
+          tag="a"
         >
           <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
           <span>{{ user.name }}</span>
@@ -32,35 +31,36 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import Bus from '../../assets/script/bus.js'
+import Bus from '@public/script/bus.js'
+import methods from '@public/script/methods.js'
 export default {
   name: 'heads',
   data () {
     return {
-      active: 0,
+      active: null,
       menu: [
-        { name: '全部单词', href: '/', icon: '', active: true },
-        { name: '翻译', href: '/Translation', icon: '', active: false },
-        { name: '查看试卷', href: '/Test', icon: '', active: false }
+        { name: '全部单词', href: '/home', icon: '', active: false },
+        { name: '翻译', href: '/translation', icon: '', active: false },
+        { name: '查看试卷', href: '/test', icon: '', active: false }
       ],
       user: null
     }
   },
-  beforeMount () {
+  created () {
     // 获取用户信息
     this.$route.query.key = '%2Fr0qngP9ySfZO3zuDkFnARuV8le7WzUbus013UdaMD4zcb4PnY%2FS3IInHShTDxz%2F9M1DXWx2b7GjQYYTKUvc'
     // this.$route.query.key = '%20ex7lgKpniDZP3zuDkFrAQmUwEdwzYwb%2Fo1%2Fm19Oejkfcq0znsGFjYN5XWEZS1f%2F681DQmxpcq2oXIcfKUvaZWh%20'
     axios({
-      url: 'http://localhost/Vue_project/Memory-word/static/php/userss.php?key=' + this.$route.query.key + '',
+      url: `${methods.path}/userss.php?key=${this.$route.query.key}`,
       method: 'get'
     }).then(res => {
       let data = res.data
       if (res.status === 200 && data) {
+        res.data._level = null
         this.user = res.data
-        // console.log('身份：', data)
         Bus.$emit('sendUser', data.userID)
         axios({ // 是否加入数据库
-          url: 'http://localhost/Vue_project/Memory-word/static/php/add_user.php',
+          url: `${methods.path}/add_user.php`,
           method: 'post',
           data: qs.stringify({
             name: data.name,
@@ -68,43 +68,51 @@ export default {
             level: data.level
           })
         }).then(_res => {
-          // console.log(_res.data)
           const _getData = _res.data
           if (_res.status === 200 && _getData.code / 1 === 4000 && _getData.data) {
             this.user._level = _getData.data.level
             // 将用户信息保存到bus中, 让其他组件获取用户信息
             Bus.$emit('userInfo', this.user)
+            this.$store.commit('getUser', this.user)
           }
         }).catch(_error => { console.log(_error) })
       }
     }).catch(error => { console.log(error) })
   },
+  beforeMount () {
+    this.toggleRouter()
+  },
   methods: {
     selectCurrent (index) {
       let active = this.active
-      this.menu[active].active = false
+      if (index < 0) {
+        this.active = null
+        return
+      }
+      if (active !== null) this.menu[active].active = false
       this.menu[index].active = true
       this.active = index
     },
-    reset () { // 取消导航的选中状态
-      if (this.user && this.user._level / 1 === 0) {
-        this.menu[this.active].active = false
-      }
+    toggleRouter () {
+      let name = (this.$route.name.indexOf('/') > -1) ? this.$route.name : `/${this.$route.name}`
+      this.selectCurrent(this.menu.findIndex(item => item.href === name))
     }
   }
 }
 </script>
 
 <style lang='less' scoped>
+  @import url('../../assets/css/public');
   @value: 15px;
   .head{
+    @width: 100%;
     position: relative;
     z-index: 5;
-    width: 100%;
+    width: @width;
     height: 65px;
     margin-bottom: 50px;
-    background-color: white;
-    padding-left: calc(100vw - 100%);
+    background-color: @color-white;
+    padding-left: calc(100vw - @width);
   }
   .h-logo{
     background: url(../../../static/img/logo_v2.png) no-repeat center;
@@ -122,7 +130,7 @@ export default {
     height: inherit;
     margin-right: @value;
     font-weight: bold;
-    color: #1e90ff;
+    color: @color;
     cursor: pointer;
   }
   .h-menu{
@@ -131,7 +139,7 @@ export default {
     li{
       width: 120px;
       height: inherit;
-      color: #1e90ff;
+      color: @color;
       transition: color .3s, background-color .3s;
       cursor: pointer;
     }
@@ -139,12 +147,8 @@ export default {
       margin-right: @value;
     }
     li:hover{
-      background-color: #1e90ff;
-      color: white;
-    }
-    .active{
-      background-color: #1e90ff;
-      color: white;
+      background-color: @color;
+      color: @color-white;
     }
   }
   .h-user{
@@ -152,22 +156,23 @@ export default {
     margin-left: auto;
     cursor: pointer;
     &:hover{
-      color: #1e90ff;
+      color: @color;
     }
   }
   .username{
     height: 100%;
     & img{
+      @val: 40px;
       display: block;
-      width: 40px;
-      height: 40px;
+      width: @val;
+      height: @val;
       border-radius: 20px;
     }
     & span {
       display: block;
       line-height: 65px;
       padding: 0 15px;
-      height: 100%;
+      height: inherit;
     }
   }
 </style>

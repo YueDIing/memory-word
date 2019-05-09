@@ -10,17 +10,17 @@
             :placeholder="'请选择分类'"
             v-model="currentClassify"
           ></repeatSelect>
-          <label for="word" class="iconfont btns">&#xe83b; <span>上传文件</span></label>
+          <label for="word" class="iconfont btns-main">&#xe83b; <span>上传文件</span></label>
           <input type="file" class="hide" id="word" @change="addWordFile" ref="wordFile">
         </div>
-        <button class="btn-auto" @click="submitFile">Submit</button>
+        <button class="btns-main" @click="submitFile">Submit</button>
       </popup>
       <div class="u-list-content" v-if="defaultActive === 0">
-        <div class="flex">
-          <h3 class="title-20">单词管理</h3>
-          <button class="btn-min" @click="changeStatus">Open</button>
+        <div class="justify">
+          <h3 class="title">单词管理</h3>
+          <button class="btns-main" @click="changeStatus">Open</button>
         </div>
-        <div class="u-list-word u-list-head">
+        <div class="list-head u-list-word u-list-head">
           <div class="position">序号</div>
           <div class="word">单词</div>
           <div class="ph_en">音标英式</div>
@@ -28,7 +28,7 @@
           <div class="time">添加时间</div>
           <div class="operation">操作</div>
         </div>
-        <ul class="u-c-list">
+        <ul class="list-content u-c-list">
           <li v-for="(item, index) in word" :key="item.id || index">
             <div class="u-list-word">
               <div class="position">{{ index + 1 }}</div>
@@ -44,8 +44,8 @@
               </div>
               <div class="iconfont more-operation">
                 <!-- &#xe68c; -->
-                <div class="btn-delete" @click="deleteWord(item.id, index)">&#xe641;</div>
-                <div class="btns" @click="changeComment(item.id, index)">&#xe68c;</div>
+                <div class="btns-danger" @click="deleteWord(item.id, index)">&#xe641;</div>
+                <div class="btns-main" @click="changeComment(item.id, index)">&#xe68c;</div>
               </div>
             </div>
           </li>
@@ -58,7 +58,7 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
-import methods from '../../../assets/script/methods'
+import methods from '@public/script/methods'
 // components
 import popup from '../../repeat/popup'
 import Fade from '../../repeat/fade'
@@ -91,7 +91,7 @@ export default {
     // 获取试卷类型
     axios({
       mehtod: 'get',
-      url: 'http://localhost/Vue_project/Memory-word/static/php/get_test_type.php'
+      url: `${methods.path}/get_test_type.php`
     }).then(res => {
       let getData = res.data
       if (res.status === 200 && getData.code / 1 === 4000) {
@@ -121,7 +121,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/change_comment.php',
+        url: `${methods.path}/change_comment.php`,
         data: qs.stringify({
           id,
           wordCn
@@ -138,7 +138,7 @@ export default {
     getAllWord () { // 获取全部单词
       axios({
         methods: 'get',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/getAllWord.php'
+        url: `${methods.path}/getAllWord.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
@@ -169,7 +169,7 @@ export default {
     deleteWord (id, index) { // 删除单词
       axios({
         method: 'post',
-        url: 'http://localhost/Vue_project/Memory-word/static/php/delete_word.php',
+        url: `${methods.path}/delete_word.php`,
         data: qs.stringify({
           id
         })
@@ -195,7 +195,7 @@ export default {
         this.changeStatus() // 关闭添加单词窗口
         axios({
           method: 'post',
-          url: 'http://localhost/Vue_project/Memory-word/static/php/get_word_file.php',
+          url: `${methods.path}/get_word_file.php`,
           data: this.formData
         }).then(res => {
           let getData = res.data
@@ -219,26 +219,18 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url('../../../assets/css/public');
   .u-content{
     width: 100%;
   }
   .u-list-content{
     flex: 8.8;
     padding: 15px 30px 30px;
-    border-radius: 3px;
+    border-radius: @border-radius;
     background-color: white;
-  }
-  .flex{
-    align-items: center;
   }
   .btn-min{
     margin-left: auto;
-  }
-  .u-list-head{
-    padding: 15px 0;
-    color: #1e90ff;
-    border-top: 1px solid #dfe4ea;
-    border-bottom: 1px solid #dfe4ea;
   }
   .u-list-word{
     display: flex;
@@ -255,24 +247,13 @@ export default {
     }
   }
   .u-c-list{
-    li{
-      line-height: 45px;
-      font-size: 14px;
-      border-radius: 3px;
-      &:nth-child(2n) .u-list-word{
-        background-color: #f1f1f1;
-      }
-      &:hover .u-list-word{
-        background-color: #DFDFDF;
-      }
-    }
     .operation{
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: @border-radius;
       transition: color .3s, background-color .3s;
       &:hover{
         color: white;
-        background-color: #1e90ff;
+        background-color: @color;
       }
     }
     .explanation{
@@ -285,20 +266,20 @@ export default {
         height: 45px;
         padding-right: 127px;
         line-height: 45px;
-        border-radius: 3px;
+        border-radius: @border-radius;
         margin: 5px 0;
       }
       .more-operation{
         display: flex;
         justify-content: center;
+        cursor: pointer;
         margin: 8px 0 12px;
         & > *{
           flex: 1;
+          padding: 0 10px;
         }
-        .btn-delete{
-          color: white;
+        .btns-danger{
           margin-right: 25px;
-          background-color: #f33a3a;
         }
       }
     }
@@ -311,11 +292,11 @@ export default {
     label{
       display: block;
       width: 100%;
+      padding: 0;
       height: 35px;
-      font-size: 12px;
       line-height: 35px;
+      text-align: center;
       margin-left: 30px;
-      cursor: pointer;
       span{
         padding-left: 5px;
       }
