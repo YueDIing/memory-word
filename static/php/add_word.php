@@ -3,6 +3,7 @@
   include('./methods.php');
 
   $word = $_POST['word'] ?? null;
+  $word_id = $_POST['wid'] ?? null;
   $time = time();
   if ($word) {
     $sql = "SELECT * FROM `word` WHERE `word_en` = '".$word['word_en']."'";

@@ -30,6 +30,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @media print{
+    .user-content{
+      margin-left: 145px;
+    }
+  }
   .user-center{
     display: flex;
   }

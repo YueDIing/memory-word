@@ -16,7 +16,7 @@
           <div class="tl-r-c" v-if="word && word.status / 1 === 0">
             <word :item="word.content" @sendAudioUrl="getAudioUrl"></word>
             <word-audio :path="audioUrl" @sendRequireClearUrl="getClearUrl"></word-audio>
-            <!-- <div class="btns-main tl-btn" @click="addWord">添加到单词库</div> -->
+            <div class="btns-main tl-btn" @click="addWord">添加到单词库</div>
           </div>
           <div class="tl-r-c" v-else-if="word">
             {{word.content.out}}
@@ -53,6 +53,7 @@ export default {
   created () {
     bus.$on('sendUser', res => {
       this.starId = res
+      console.log(res)
     })
   },
   methods: {

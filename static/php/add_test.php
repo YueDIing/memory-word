@@ -4,8 +4,10 @@
 
   $cid = $_POST['class_id'] ?? null;
   $number = $_POST['number'] ?? null;
+  $mode = $_POST['mode'] ?? null; // 0 英文 1 中文 2 混搭
+
   $time = time();
-  if ($cid && $number) {
+  if ($cid && $number && isset($mode)) {
     $_empty = isEmpty("`test_type`", "`id` = $cid");
     if (count($_empty) !== 0) {
       $getClasifyCount = $conn -> query("SELECT count(*) AS `num` FROM `test` WHERE `id` = $cid") -> fetchAll(PDO::FETCH_ASSOC);
@@ -41,11 +43,23 @@
       }
 
       for ($i = 0; $i < $number; $i++) {
-        $wordType = rand(0, 1);
+        // wordType 单词类型 0 中文 1英文
+        $wordType = 0;
+        switch ($mode) {
+          case 0: // 英文模式
+            $wordType = 0;
+            break;
+          case 1: // 中文模式
+            $wordType = 1;
+            break;
+          case 2: // 混搭
+            $wordType = rand(0, 1);
+            break;
+        }
         $randWord[] = [$allWord[$ranArr[$i]]['id'], $wordType];
       }
 
-      $computedNum = "SELECT COUNT(*) AS `num` FROM `test` WHERE `cid` = '$cid'";
+      $computedNum = "SELECT `num` FROM `test_type` WHERE `id` =$cid";
       $num = $conn -> query($computedNum) -> fetch(PDO::FETCH_ASSOC);
       $num = ($num['num'] <= 1) ? $num['num'] + 1 : $num['num'];
       $num = ($num / 1 < 10) ? '0' . $num : $num;
@@ -53,7 +67,10 @@
       $jsonWord = json_encode($randWord);
       $insert = "INSERT INTO `test` (`cid`, `title`, `number`, `status`, `json_data`, `time`) VALUES ('$cid', '$title', '$number', 0, '$jsonWord', '$time')";
       if ($conn -> exec($insert)) {
-        returnMsg(4000, '', 'add success');
+        $update_cid = "UPDATE `test_type` SET `num` = `num` + 1 WHERE `id` = $cid";
+        if ($conn -> exec($update_cid)) {
+          returnMsg(4000, '', 'add success');
+        }
       }
     } else {
       returnMsg(4004, '', 'classify does mpt exost');

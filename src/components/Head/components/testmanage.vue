@@ -53,6 +53,14 @@
             :placeholder="'请选择数量'"
             v-model="newTest.number"
           ></repeat-select>
+          <!-- <repeatSwitch></repeatSwitch> -->
+          <repeat-select
+            :empty="true"
+            :data="testMode"
+            :placeholder="'请选择模式'"
+            :default="0"
+            v-model="newTest.mode"
+          ></repeat-select>
           <button class="btns-main" @click="submitTest">添加</button>
         </div>
       </div>
@@ -78,7 +86,7 @@ export default {
       user: null,
       allTest: null,
       newTestStatus: false, // 是否显示添加试卷
-      newTest: {title: '', number: ''},
+      newTest: {title: '', number: '', mode: ''},
       classifyList: null, // 显示所有试卷
       numberList: [
         { id: '0', val: '40' },
@@ -93,6 +101,11 @@ export default {
         { id: '6', val: '160' },
         { id: '6', val: '180' },
         { id: '6', val: '200' }
+      ],
+      testMode: [
+        { id: '0', val: '英文' },
+        { id: '1', val: '中文' },
+        { id: '2', val: '中英' }
       ]
     }
   },
@@ -138,14 +151,15 @@ export default {
       })
     },
     submitTest () { // 添加试卷
-      let parameter = this.newTest
-      if (parameter.title !== '' && parameter.number !== '') {
+      const parameter = this.newTest
+      if (parameter.title !== '' && parameter.number !== '' && parameter.mode !== '') {
         axios({
           method: 'post',
           url: `${methods.path}/add_test.php`,
           data: qs.stringify({
-            class_id: this.newTest.title.id,
-            number: this.newTest.number.val
+            class_id: parameter.title.id,
+            number: parameter.number.val,
+            mode: parameter.mode.id
           })
         }).then(res => {
           let getData = res.data
@@ -179,82 +193,82 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  @import url("../../../assets/css/public");
-  .border-radius{
-    border-radius: 3px;
+@import url("../../../assets/css/public");
+.border-radius{
+  border-radius: 3px;
+}
+.test-manage{
+  width: 100%;
+}
+.all-test{
+  padding: 15px 30px 30px;
+  .border-radius();
+  background-color: @color-white;
+}
+.t-head{
+  display: flex;
+  .btn-min{
+    margin-left: auto;
   }
-  .test-manage{
-    width: 100%;
-  }
-  .all-test{
-    padding: 15px 30px 30px;
-    .border-radius();
-    background-color: @color-white;
-  }
-  .t-head{
+}
+.t-list-head{
+  & > li{
     display: flex;
-    .btn-min{
-      margin-left: auto;
-    }
+    text-align: center;
   }
-  .t-list-head{
-    & > li{
-      display: flex;
-      text-align: center;
-    }
+}
+.t-list{
+  li{
+    display: flex;
+    text-align: center;
   }
-  .t-list{
-    li{
-      display: flex;
-      text-align: center;
-    }
-  }
-  .t-position,
-  .t-number,
-  .t-status{
+}
+.t-position,
+.t-number,
+.t-status{
+  flex: 1;
+}
+.t-title{
+  flex: 3;
+}
+.t-time,
+.t-operation{
+  flex: 2;
+}
+.t-operation{
+  display: flex;
+  justify-content: center;
+  & > *{
     flex: 1;
   }
-  .t-title{
-    flex: 3;
+}
+.btn-auto{
+  margin-top: 25px;
+}
+.select{
+  display: block;
+  cursor: pointer;
+  transition: background-color .3s, color .3s;
+  &:hover{
+    color: @color-white;
+    background-color: @color;
   }
-  .t-time,
-  .t-operation{
-    flex: 2;
-  }
-  .t-operation{
-    display: flex;
-    justify-content: center;
-    & > *{
-     flex: 1;
-    }
-  }
-  .btn-auto{
-    margin-top: 25px;
-  }
-  .select{
-    display: block;
-    cursor: pointer;
-    transition: background-color .3s, color .3s;
-    &:hover{
-      color: @color-white;
-      background-color: @color;
-    }
-  }
-  .btns-main{
-    margin-top: 20px;
-  }
-  .nodrop{
-    @color-ccc: #ccc;
+}
+.btns-main{
+  margin-top: 20px;
+}
+.nodrop{
+  @color-ccc: #ccc;
+  color: @color-ccc;
+  &:hover{
     color: @color-ccc;
-    &:hover{
-      color: @color-ccc;
-      background-color: transparent;
-    }
+    background-color: transparent;
   }
-  // popup
-  .t-enter{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
+}
+// popup
+.t-enter{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
 </style>

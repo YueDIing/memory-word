@@ -32,7 +32,10 @@
           <li v-for="(item, index) in word" :key="item.id || index">
             <div class="u-list-word">
               <div class="position">{{ index + 1 }}</div>
-              <div class="word">{{ item.word_en }}</div>
+              <div class="word">
+                <input type="text" v-model='word[index].word_en' v-if="index !== changeIndex" readonly>
+                <input type="text" v-model='word[index].word_en' v-else>
+              </div>
               <div class="ph_en">{{ item.ph_en }}</div>
               <div class="ph_an">{{ item.ph_am }}</div>
               <div class="time">{{item.time}}</div>
@@ -43,7 +46,6 @@
                 <input type="text" v-model="word[index].word_json[_index]">
               </div>
               <div class="iconfont more-operation">
-                <!-- &#xe68c; -->
                 <div class="btns-danger" @click="deleteWord(item.id, index)">&#xe641;</div>
                 <div class="btns-main" @click="changeComment(item.id, index)">&#xe68c;</div>
               </div>
@@ -83,7 +85,7 @@ export default {
       popupStatus: false, // 弹窗
       classifyList: null, // 分类列表
       currentClassify: '', // 当前分类
-      formData: null // 暂存formdata数据，到点击提交是提交数据
+      formData: null // 暂存formdata数据，到点击提交时提交数据
     }
   },
   created () {
@@ -114,22 +116,19 @@ export default {
       this.changeIndex = index
     },
     changeComment (id, index) {
-      let wordCn = this.word[index].word_json
-      if (this.currentWord === wordCn) {
-        methods.popup('Data has not changed')
-        return
-      }
+      const word = this.word[index]
       axios({
         method: 'post',
         url: `${methods.path}/change_comment.php`,
         data: qs.stringify({
           id,
-          wordCn
+          cn: word.word_json,
+          en: word.word_en
         })
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code === 4000) {
-          console.log(getData.data)
+          methods.popup('change success')
         } else {
           methods.getCode(getData.code)
         }
@@ -188,7 +187,7 @@ export default {
       this.currentClassify = ''
       this.popupStatus = !this.popupStatus
     },
-    submitFile () {
+    submitFile () { // 提交文件
       if (this.currentClassify && this.formData) {
         // 0.3秒后显示loading动画
         let time = setTimeout(() => { this.loading = true }, 300)
@@ -245,6 +244,13 @@ export default {
     .time{
       flex: 2;
     }
+    .word input{
+      height: inherit;
+      line-height: inherit;
+      text-align: inherit;
+      border: none;
+      background-color: transparent;
+    }
   }
   .u-c-list{
     .operation{
@@ -269,19 +275,19 @@ export default {
         border-radius: @border-radius;
         margin: 5px 0;
       }
-      .more-operation{
-        display: flex;
-        justify-content: center;
-        cursor: pointer;
-        margin: 8px 0 12px;
-        & > *{
-          flex: 1;
-          padding: 0 10px;
-        }
-        .btns-danger{
-          margin-right: 25px;
-        }
-      }
+    }
+  }
+  .more-operation{
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    margin: 8px 0 12px;
+    & > *{
+      flex: 1;
+      padding: 0 10px;
+    }
+    .btns-danger{
+      margin-right: 25px;
     }
   }
   .word-file{

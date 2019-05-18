@@ -32,6 +32,11 @@
     return $contents;
   }
 
+  function transilation ($content = '') {
+    $fy = curl("http://fy.iciba.com/ajax.php?a=fy&f=auto&t=auto&w=$content");
+    return json_decode($fy, true);
+  }
+
   function isEmpty ($table = '', $condition = '') {
     global $conn;
     $sql = "SELECT * FROM $table WHERE $condition";

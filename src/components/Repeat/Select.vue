@@ -1,5 +1,5 @@
 <template>
-  <div class="select-main">
+  <div class="select-main" @click="test">
     <div class="s-enter">
       <input type="text" class="select"
         readonly
@@ -50,13 +50,15 @@ export default {
       default: false
     },
     setVal: { // 双向绑定, 必需的
-      type: [String, Number, Object],
-      default: '',
+      type: [Object, String],
       required: true
     },
     placeholder: { // 提示文字
       type: String,
       default: '请选择'
+    },
+    default: {
+      type: Number
     }
   },
   model: { // 双向绑定的变量, prop v-model的值
@@ -74,20 +76,33 @@ export default {
       rotate: { transform: 'rotate(180deg)' }
     }
   },
+  created () {
+    const val = this.data[this.default]
+    // 判断是否添加了默认值
+    if (val !== undefined) {
+      this.value = val
+      this.$emit('change', val)
+    }
+  },
   methods: {
     focus () {
       this.status = true
     },
     blur () {
-      this.status = false
+      setTimeout(() => {
+        this.status = false
+      }, 100)
     },
     getValue (val) {
+      console.log(1)
       this.value = val
       this.$emit('change', val)
     },
     remove () {
       this.value = {}
       this.$emit('change', '')
+    },
+    test () {
     }
   }
 }
@@ -134,7 +149,7 @@ export default {
       justify-content: space-between;
       width: 100%;
       height: 35px;
-      padding: 0 8px 0 8px;
+      padding: 0 15px 0 15px;
       font-size: 12px;
       line-height: 35px;
       color: #606266;

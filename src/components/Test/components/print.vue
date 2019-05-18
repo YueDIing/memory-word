@@ -4,13 +4,13 @@
     <word-audio :path="audioPath" @sendRequireClearUrl="clearUrl"></word-audio>
     <ul class="word-list" v-if="word.status / 1 === 0">
       <li v-for="(item, index) in word.test" :key="index">
-        <div>{{ item }}</div>
+        <div>{{ `${(index + 1).toString().padStart(2, '0')}. ${item}` }}</div>
         <div class="answer-content"></div>
       </li>
     </ul>
     <ul class="answer-list" v-else>
       <li v-for="(item, index) in word.test" :key="item.id || index">
-        <word :item="item" @sendAudioUrl="getAudioUrl"></word>
+        <word :item="item" :directory="index + 1" @sendAudioUrl="getAudioUrl"></word>
       </li>
     </ul>
   </div>
@@ -95,7 +95,7 @@ export default {
   @page{
     size: A4 portrait;
     // 底部60防止最后一行的一部分出现在第二页
-    margin: 20px 10px 80px;
+    margin: 20px 10px 0px;
   }
   @media print{
     .word-list li{
@@ -138,7 +138,7 @@ export default {
     li{
       display: flex;
       flex-direction: column;
-      height: 60px;
+      height: 50px;
       margin-bottom: 15px;
       padding: 0 20px;
       font-size: 14px;

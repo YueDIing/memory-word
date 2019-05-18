@@ -4,11 +4,6 @@
 
   $word = $_GET['word'] ?? null;
 
-  function transilation ($content = '') {
-    $fy = curl("http://fy.iciba.com/ajax.php?a=fy&f=auto&t=auto&w=$content");
-    return json_decode($fy, true);
-  }
-
   if (isset($word)) {
     $fy_res = transilation($word);
     // 中转英文时, status = 1

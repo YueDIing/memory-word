@@ -1,16 +1,20 @@
 <template>
   <div class="">
-    <div class="word title">{{item.word_en}}</div>
+    <div class="flex word title">
+      <span v-if="directory">{{`${directory.toString().padStart(2, '0')}. ${item.word_en}`}}</span>
+      <span v-else>{{item.word_en}}</span>
+      <div class="ph-icon" @click="playSound(item.word_en)"></div>
+    </div>
     <div class="audio" v-if="item.ph_en || item.ph_am">
       <div class="ph">
         <span>英</span>
         <div class="en" v-if="item.ph_en">[{{item.ph_en}}]</div>
-        <div class="ph-icon" v-if="item.ph_en_mp3" @click="playSound(item.ph_en_mp3)"></div>
+        <div class="ph-icon" @click="playSound(item.word_en, 'uk')"></div>
       </div>
       <div class="ph">
         <span>美</span>
         <div class="am" v-if="item.ph_am">[{{item.ph_am}}]</div>
-        <div class="ph-icon" v-if="item.ph_am_mp3" @click="playSound(item.ph_am_mp3)"></div>
+        <div class="ph-icon" @click="playSound(item.word_en)"></div>
       </div>
     </div>
     <ul class="cn-list">
@@ -29,12 +33,16 @@ export default {
     item: {
       type: Object,
       required: true
+    },
+    directory: { // 是否显示索引
+      type: Number,
+      default: null
     }
   },
   name: 'word',
   methods: {
-    playSound (url) {
-      this.$emit('sendAudioUrl', url)
+    playSound (name, lan = 'en') { // en 美式 uk 英式, 数据来源百度翻译
+      this.$emit('sendAudioUrl', `https://fanyi.baidu.com/gettts?lan=${lan}&text=${name}&spd=3&source=web`)
     }
   }
 }
@@ -45,12 +53,20 @@ export default {
     display: flex;
   }
   .word{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     padding-bottom: 3px;
     margin-bottom: 8px;
     font-size: 14px;
     line-height: 30px;
     font-weight: bold;
     border-bottom: 1px solid #ced6e0;
+    span{
+      display: block;
+      width: 100%;
+      padding-right: 15px;
+    }
   }
   .audio{
     .display_flex();
