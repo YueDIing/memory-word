@@ -33,21 +33,35 @@
             <div class="u-list-word">
               <div class="position">{{ index + 1 }}</div>
               <div class="word">
-                <input type="text" v-model='word[index].word_en' v-if="index !== changeIndex" readonly>
-                <input type="text" v-model='word[index].word_en' v-else>
+                <input type="text" v-model='word[index].word' v-if="index !== changeIndex" readonly>
+                <input type="text" v-model='word[index].word' v-else>
               </div>
               <div class="ph_en">{{ item.ph_en }}</div>
               <div class="ph_an">{{ item.ph_am }}</div>
               <div class="time">{{item.time}}</div>
-              <div class="iconfont operation" @click="openWindow(index, item.word_json)">&#xe6ce;</div>
+              <div class="iconfont operation" @click="openWindow(index, item.explanation)">&#xe6ce;</div>
             </div>
-            <div class="explanation" v-if="changeIndex === index">
-              <div v-for="(temp, _index) in item.word_json" :key="_index">
-                <input type="text" v-model="word[index].word_json[_index]">
+            <div class="word-explanation" v-if="changeIndex === index">
+              <div class="explanation">
+                <div
+                  v-for="(temp, _index) in item.explanation"
+                  :key="_index"
+                  class="explanation-wrap"
+                >
+                  <div class="explanation-content">
+                    <div class="explanation-key">{{temp.part}}</div>
+                    <input
+                      type="text"
+                      v-for="(current, __index) in temp.means"
+                      :key="current || __index"
+                      v-model="word[index].explanation[_index].means[__index]"
+                    >
+                  </div>
+                </div>
               </div>
               <div class="iconfont more-operation">
                 <div class="btns-danger" @click="deleteWord(item.id, index)">&#xe641;</div>
-                <div class="btns-main" @click="changeComment(item.id, index)">&#xe68c;</div>
+                <div class="btns-main" @click="changeComment(index)">&#xe68c;</div>
               </div>
             </div>
           </li>
@@ -115,15 +129,15 @@ export default {
       this.currentWord = cn
       this.changeIndex = index
     },
-    changeComment (id, index) {
-      const word = this.word[index]
+    changeComment (index) {
+      const {id, explanation} = this.word[index]
       axios({
         method: 'post',
-        url: `${methods.path}/change_comment.php`,
+        url: `${methods.path}/manage_word.php`,
         data: qs.stringify({
+          type: 'update',
           id,
-          cn: word.word_json,
-          en: word.word_en
+          explanation
         })
       }).then(res => {
         let getData = res.data
@@ -137,22 +151,21 @@ export default {
     getAllWord () { // 获取全部单词
       axios({
         methods: 'get',
-        url: `${methods.path}/getAllWord.php`
+        url: `${methods.path}/manage_word.php`
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
-          let cn = getData.data
-          getData.data = cn.map(item => {
-            item.word_json = JSON.parse(item.word_json)
+          getData.data = getData.data.map(item => {
+            item.explanation = JSON.parse(item.explanation)
             return item
           })
           this.word = getData.data
         }
       }).catch(error => { console.log(error) })
     },
-    addWordFile (ev) { // 添加单词
+    addWordFile (ev) { // 以文件形式添加单词
       const file = ev.target.files[0]
-      if (file.type.indexOf('text') === -1) {
+      if (file && file.type.indexOf('json') === -1) {
         alert('非txt文件')
         return
       }
@@ -161,27 +174,29 @@ export default {
       files.onload = e => {
         let data = new FormData()
         data.append('file', file)
-        data.append('classify_id', this.currentClassify.id)
         this.formData = data
       }
     },
     deleteWord (id, index) { // 删除单词
-      axios({
-        method: 'post',
-        url: `${methods.path}/delete_word.php`,
-        data: qs.stringify({
-          id
+      if (confirm('是否删除单词')) {
+        axios({
+          method: 'post',
+          url: `${methods.path}/manage_word.php`,
+          data: qs.stringify({
+            type: 'remove',
+            id
+          })
+        }).then(res => {
+          let getData = res.data
+          if (res.status === 200 && getData.code / 1 === 4000) {
+            this.word.splice(index, 1)
+            this.currentWord = null
+            this.changeIndex = null
+          } else {
+            methods.getCode(getData.code)
+          }
         })
-      }).then(res => {
-        let getData = res.data
-        if (res.status === 200 && getData.code / 1 === 4000) {
-          this.word.splice(index, 1)
-          this.currentWord = null
-          this.changeIndex = null
-        } else {
-          methods.getCode(getData.code)
-        }
-      })
+      }
     },
     changeStatus () {
       this.currentClassify = ''
@@ -199,15 +214,13 @@ export default {
         }).then(res => {
           let getData = res.data
           if (res.status === 200 && getData.code / 1 === 4000) {
-            console.log(getData)
             this.formData = null
             // 待优化： 当一个加载时间只有0.4s的时候, 页面会闪烁一下
             this.getAllWord()
             clearTimeout(time)
             this.loading = false
-          } else {
-            methods.getCode(getData.code)
           }
+          methods.getCode(getData.code)
         })
       } else {
         alert('参数为空')
@@ -263,25 +276,41 @@ export default {
       }
     }
     .explanation{
-      & > div{
-        display: flex;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0 15px;
+      .explanation-wrap{
+        @width: calc(100% - 25px);
+        width: calc(@width / 2);
+        &:nth-child(2n){
+          // margin: 0 20px;
+          margin-left: 25px;
+        }
       }
-      input {
-        display: block;
-        width: 100%;
-        height: 45px;
-        padding-right: 127px;
-        line-height: 45px;
-        border-radius: @border-radius;
-        margin: 5px 0;
+      .explanation-key{
+        font-weight: bold;
+        font-size: 18px;
+        padding-left: 5px;
+      }
+      .explanation-content{
+        input {
+          display: block;
+          width: 100%;
+          height: 45px;
+          // padding-right: 127px;
+          line-height: 45px;
+          border-radius: @border-radius;
+          margin: 5px 0;
+        }
       }
     }
   }
   .more-operation{
     display: flex;
+    padding: 0 15px 15px;
     justify-content: center;
     cursor: pointer;
-    margin: 8px 0 12px;
+    margin: 8px 0;
     & > *{
       flex: 1;
       padding: 0 10px;

@@ -50,7 +50,7 @@ export default {
   },
   beforeMount () { // 获取数据库中的单词
     axios({
-      url: `${methods.path}/getAllWord.php`,
+      url: `${methods.path}/manage_word.php`,
       method: 'get'
     }).then(res => {
       let getData = res.data
@@ -59,8 +59,8 @@ export default {
         // let currentWord = this.firstLetter
         let newWord = {}
         for (let i = 0; i < len; i++) {
-          getData.data[i].word_json = JSON.parse(getData.data[i].word_json)
-          let letter = getData.data[i].word_en.slice(0, 1).toUpperCase() // 获取首字母
+          getData.data[i].word_json = JSON.parse(getData.data[i].explanation)
+          let letter = getData.data[i].word.slice(0, 1).toUpperCase() // 获取首字母
           // 以首字母分类
           if (newWord[letter]) {
             newWord[letter].push(getData.data[i])
@@ -117,7 +117,6 @@ export default {
       this.showWord = this.firstLetter[key]
       this.wordHeight = [] // 清空之前的瀑布流的数据
       this.changeLayout()
-      console.log(this.firstLetter)
     },
     getAudioUrl (url) { // 监听sendAudioUrl触发的事件
       this.audioPath = url

@@ -8,8 +8,7 @@
           v-for="(item, index) in menu"
           :key="index"
           tag="li"
-          :class="[(item.active) ? 'active' : '']"
-          @click.native="toggleRouter"
+          :class="[currentRouter === index ? 'active' : '']"
         >
           {{item.name}}
         </router-link>
@@ -40,7 +39,6 @@ export default {
       active: null,
       menu: [
         { name: '全部单词', href: '/home', icon: '', active: false },
-        { name: '翻译', href: '/translation', icon: '', active: false },
         { name: '查看试卷', href: '/test', icon: '', active: false }
       ],
       user: null
@@ -79,23 +77,11 @@ export default {
       }
     }).catch(error => { console.log(error) })
   },
-  beforeMount () {
-    this.toggleRouter()
-  },
-  methods: {
-    selectCurrent (index) {
-      let active = this.active
-      if (index < 0) {
-        this.active = null
-        return
-      }
-      if (active !== null) this.menu[active].active = false
-      this.menu[index].active = true
-      this.active = index
-    },
-    toggleRouter () {
-      let name = (this.$route.name.indexOf('/') > -1) ? this.$route.name : `/${this.$route.name}`
-      this.selectCurrent(this.menu.findIndex(item => item.href === name))
+  computed: {
+    currentRouter () {
+      const menu = this.menu
+      const route = this.$route
+      return menu.findIndex(item => item.href === route.path.toLowerCase())
     }
   }
 }

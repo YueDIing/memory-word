@@ -26,7 +26,7 @@
             <div class="c-list-num">{{item.num}}</div>
             <div class="c-list-time">{{item.time}}</div>
             <div class="c-list-operation">
-              <div class="iconfont btns-danger" @click="deleteClassify(item.id, index)" v-if="item.id / 1 !== 1">&#xe641;</div>
+              <div class="iconfont btn-danger" @click="deleteClassify(item.id, index)" v-if="item.id / 1 !== 1">&#xe641;</div>
             </div>
           </li>
         </ul>
@@ -156,10 +156,19 @@ export default {
     }
   }
 }
-.btns-danger{
+.btn-danger{
   display: block;
   height: 45px;
   line-height: 45px;
   padding: 0;
+  color: #f56c6c;
+  transition: color .3s, background-color .3s;
+  background-color: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover{
+    color: white;
+    background-color: #f56c6c;
+  }
 }
 </style>

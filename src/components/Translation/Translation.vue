@@ -75,7 +75,6 @@ export default {
                   delete getData.data.content.word_mean // 删除api中的中文翻译
                   getData.data.content.word_json = wordMean // 重新命名并保存中文翻译
                 }
-                console.log(getData.data)
                 this.word = getData.data
               }
             }

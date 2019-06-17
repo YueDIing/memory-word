@@ -4,7 +4,7 @@
     <word-audio :path="audioPath" @sendRequireClearUrl="clearUrl"></word-audio>
     <ul class="word-list" v-if="word.status / 1 === 0">
       <li v-for="(item, index) in word.test" :key="index">
-        <div>{{ `${(index + 1).toString().padStart(2, '0')}. ${item}` }}</div>
+        <div>{{ `${(index + 1).toString().padStart(2, '0')}. ${item.means[0]}` }}</div>
         <div class="answer-content"></div>
       </li>
     </ul>
@@ -46,36 +46,15 @@ export default {
       }).then(res => {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
-          if (getData.data.status / 1 === 0) {
-            getData.data.test = getData.data.test.map(item => {
-              // 判断单词是否被删除
-              if (!item) {
-                return '单词已被删除'
-              }
-              let letter = /^[A-z]+$/gi.test(item)
-              // 处理单词释义
-              if (!letter) {
-                let removeBefore = item.replace(/^[A-z]*\.?\s?(&\s?.*\.)?/g, '')
-                let split = removeBefore.split(';')
-                let _split = split[0].split('，')
-                // 判断 使用 ; 分割后的第一个元素 再使用 , 分割长度是否大于2
-                if (_split.length >= 2) {
-                  // 返回 ; 分割后的第一个元素的前两个元素
-                  return `${_split[0]} ${_split[1]}`
-                } else {
-                  return `${split[0]} ${split[1]}`
-                }
-              } else {
-                return item
-              }
-            })
-          } else {
-            getData.data.test = getData.data.test.map(item => {
-              item.word_json = JSON.parse(item.word_json)
+          let data = getData.data
+          if (!data.status / 1) {
+            data.test.map(item => {
+              item.word_json = JSON.parse(item.explanation)
               return item
             })
           }
-          this.word = getData.data
+          console.log(data.test)
+          this.word = data
         } else {
           methods.getCode(getData.code)
         }
