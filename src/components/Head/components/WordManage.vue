@@ -18,7 +18,7 @@
       <div class="u-list-content" v-if="defaultActive === 0">
         <div class="justify">
           <h3 class="title">单词管理</h3>
-          <button class="btns-main" @click="changeStatus">Open</button>
+          <button class="btns-main" @click="changeStatus">添加单词</button>
         </div>
         <div class="list-head u-list-word u-list-head">
           <div class="position">序号</div>
@@ -243,6 +243,9 @@ export default {
   }
   .btn-min{
     margin-left: auto;
+  }
+  .justify .btns-main{
+    margin-top: 20px;
   }
   .u-list-word{
     display: flex;

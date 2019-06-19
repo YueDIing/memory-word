@@ -1,6 +1,5 @@
 <template>
   <ul class="u-list">
-
     <router-link
       :class="[currentRouter === index ? 'active' : '']"
       :to="{path: item.path}"

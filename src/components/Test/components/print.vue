@@ -4,13 +4,14 @@
     <word-audio :path="audioPath" @sendRequireClearUrl="clearUrl"></word-audio>
     <ul class="word-list" v-if="word.status / 1 === 0">
       <li v-for="(item, index) in word.test" :key="index">
-        <div>{{ `${(index + 1).toString().padStart(2, '0')}. ${item.means[0]}` }}</div>
+        <div>{{ `${(index + 1).toString().padStart(2, '0')}. ${item}` }}</div>
         <div class="answer-content"></div>
       </li>
     </ul>
     <ul class="answer-list" v-else>
       <li v-for="(item, index) in word.test" :key="item.id || index">
         <word :item="item" :directory="index + 1" @sendAudioUrl="getAudioUrl"></word>
+        <!-- {{item}} -->
       </li>
     </ul>
   </div>
@@ -47,13 +48,13 @@ export default {
         let getData = res.data
         if (res.status === 200 && getData.code / 1 === 4000) {
           let data = getData.data
-          if (!data.status / 1) {
+          if (data.status / 1 === 1) {
             data.test.map(item => {
               item.word_json = JSON.parse(item.explanation)
               return item
             })
           }
-          console.log(data.test)
+          console.log(data)
           this.word = data
         } else {
           methods.getCode(getData.code)
@@ -84,7 +85,6 @@ export default {
     }
     .t-print{
       margin: 0;
-      // padding: 0;
       background-color: transparent;
     }
   }

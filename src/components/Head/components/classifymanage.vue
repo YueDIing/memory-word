@@ -125,6 +125,9 @@ export default {
   border-radius: @border-radius;
   background-color: @color-white;
 }
+.justify .btns-main{
+  margin-top: 20px;
+}
 .classify-name{
   flex: 8;
   height: 40px;

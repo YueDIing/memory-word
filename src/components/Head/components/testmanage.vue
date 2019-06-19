@@ -6,7 +6,7 @@
           <h3 class="title">试卷管理</h3>
           <div class="btns-main"
             @click="change"
-          >New Test</div>
+          >添加试卷</div>
         </div>
         <ul class="list-head t-list-head">
           <li>
