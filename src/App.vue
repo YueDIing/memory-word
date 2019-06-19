@@ -19,7 +19,7 @@
 
 <script>
 import './assets/css/global.less'
-// import bus from './assets/script/bus'
+
 // components
 import backTop from './components/repeat/backTop'
 import heads from './components/head/head'
@@ -28,8 +28,6 @@ export default {
   components: {
     backTop,
     heads
-  },
-  created () {
   }
 }
 </script>
@@ -49,11 +47,6 @@ export default {
   margin: 0 auto 50px;
 }
 .fade-enter-active, .fade-leave-active{
-  /*
-    由于动画模式是out-in 把原本的.3s 替换成.15s
-    解决问题
-      动画完成时间从 0.6 => 0.4 (目前进出各0.2)
-  */
   transition: opacity .2s;
 }
 @media print{

@@ -1,30 +1,32 @@
 <template>
-  <div class="head">
-    <div class="h-content">
-      <router-link tag="div" to="/" class="center title-main h-logo"></router-link>
-      <ul class="h-menu">
-        <router-link class="center"
-          :to="item.href"
-          v-for="(item, index) in menu"
-          :key="index"
-          tag="li"
-          :class="[currentRouter === index ? 'active' : '']"
-        >
-          {{item.name}}
-        </router-link>
-      </ul>
-      <div class="center h-user" v-if="user && JSON.stringify(user) !== '{}'">
-        <router-link
-          class="center username"
-          :to="user && user._level / 1 === 0 ? '/userCenter' : ''"
-          tag="a"
-        >
-          <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
-          <span>{{ user.name }}</span>
-        </router-link>
+  <transition name="fade">
+    <div class="head">
+      <div class="h-content">
+        <router-link tag="div" to="/" class="center title-main h-logo"></router-link>
+        <ul class="h-menu">
+          <router-link class="center"
+            :to="{path: item.href, query: {key: userKey}}"
+            v-for="(item, index) in menu"
+            :key="index"
+            tag="li"
+            :class="[currentRouter === index ? 'active' : '']"
+          >
+            {{item.name}}
+          </router-link>
+        </ul>
+        <div class="center h-user" v-if="user && JSON.stringify(user) !== '{}'">
+          <router-link
+            class="center username"
+            :to="user && user._level / 1 === 0 ? {path: '/userCenter', query: {key: userKey}} : {paty: '', query: {key: userKey}}"
+            tag="a"
+          >
+            <img :src="'http://10.21.40.40/star2/' + user.image" alt="userImg">
+            <span>{{ user.name }}</span>
+          </router-link>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -41,41 +43,47 @@ export default {
         { name: '全部单词', href: '/home', icon: '', active: false },
         { name: '查看试卷', href: '/test', icon: '', active: false }
       ],
-      user: null
+      user: null,
+      userKey: null
     }
   },
   created () {
     // 获取用户信息
-    this.$route.query.key = '%2Fr0qngP9ySfZO3zuDkFnARuV8le7WzUbus013UdaMD4zcb4PnY%2FS3IInHShTDxz%2F9M1DXWx2b7GjQYYTKUvc'
-    // this.$route.query.key = '%20ex7lgKpniDZP3zuDkFrAQmUwEdwzYwb%2Fo1%2Fm19Oejkfcq0znsGFjYN5XWEZS1f%2F681DQmxpcq2oXIcfKUvaZWh%20'
-    axios({
-      url: `${methods.path}/userss.php?key=${this.$route.query.key}`,
-      method: 'get'
-    }).then(res => {
-      let data = res.data
-      if (res.status === 200 && data) {
-        res.data._level = null
-        this.user = res.data
-        Bus.$emit('sendUser', data.userID)
-        axios({ // 是否加入数据库
-          url: `${methods.path}/add_user.php`,
-          method: 'post',
-          data: qs.stringify({
-            name: data.name,
-            star_id: data.userID,
-            level: data.level
-          })
-        }).then(_res => {
-          const _getData = _res.data
-          if (_res.status === 200 && _getData.code / 1 === 4000 && _getData.data) {
-            this.user._level = _getData.data.level
-            // 将用户信息保存到bus中, 让其他组件获取用户信息
-            Bus.$emit('userInfo', this.user)
-            this.$store.commit('getUser', this.user)
-          }
-        }).catch(_error => { console.log(_error) })
-      }
-    }).catch(error => { console.log(error) })
+    const key = this.$route.query.key
+    this.userKey = key
+    // ?key=%2Fr0qngP9ySfZO3zuDkFnARuV8le7WzUbus013UdaMD4zcb4PnY%2FS3IInHShTDxz%2F9M1DXWx2b7GjQYYTKUvc
+    // this.$route.query.key = '%2Fr0qngP9ySfZO3zuDkFnARuV8le7WzUbus013UdaMD4zcb4PnY%2FS3IInHShTDxz%2F9M1DXWx2b7GjQYYTKUvc' // LJ test use
+    // this.$route.query.key = '%20ex7lgKpniDZP3zuDkFrAQmUwEdwzYwb%2Fo1%2Fm19Oejkfcq0znsGFjYN5XWEZS1f%2F681DQmxpcq2oXIcfKUvaZWh%20' // CJS test use
+    if (key) {
+      axios({
+        url: `${methods.path}/userss.php?key=${key}`,
+        method: 'get'
+      }).then(res => {
+        let data = res.data
+        if (res.status === 200 && data) {
+          res.data._level = null
+          this.user = res.data
+          Bus.$emit('sendUser', data.userID)
+          axios({ // 是否加入数据库
+            url: `${methods.path}/add_user.php`,
+            method: 'post',
+            data: qs.stringify({
+              name: data.name,
+              star_id: data.userID,
+              level: data.level
+            })
+          }).then(_res => {
+            const _getData = _res.data
+            if (_res.status === 200 && _getData.code / 1 === 4000) {
+              this.user._level = _getData.data.level
+              // 将用户信息保存到bus中, 让其他组件获取用户信息
+              Bus.$emit('userInfo', this.user)
+              this.$store.commit('getUser', this.user)
+            }
+          }).catch(_error => { console.log(_error) })
+        }
+      }).catch(error => { console.log(error) })
+    }
   },
   computed: {
     currentRouter () {

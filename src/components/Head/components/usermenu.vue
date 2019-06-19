@@ -2,7 +2,7 @@
   <ul class="u-list">
     <router-link
       :class="[currentRouter === index ? 'active' : '']"
-      :to="{path: item.path}"
+      :to="{path: item.path, query: {key: userKey}}"
       v-for="(item, index) in menu" :key="item.id || index"
       tag="li"
     >
@@ -22,7 +22,8 @@ export default {
         { id: 0, content: '试卷管理', path: '/usercenter/testmanage', icon: '&#xe6ca;', active: false },
         { id: 1, content: '单词管理', path: '/usercenter/wordManage', icon: '&#xe624;', active: true },
         { id: 2, content: '分类管理', path: '/usercenter/classifyManage', icon: '&#xe600;', active: false }
-      ]
+      ],
+      userKey: null
     }
   },
   computed: {
@@ -31,6 +32,9 @@ export default {
       const route = this.$route
       return menu.findIndex(item => item.path.toLowerCase() === route.path.toLowerCase())
     }
+  },
+  created () {
+    this.userKey = this.$route.query.key
   }
 }
 </script>

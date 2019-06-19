@@ -53,15 +53,15 @@ export default new Router({
        * @param {Object} origin 源路由
        * @param {function} next 回调, 进入下一个路由
        */
-      beforeEnter (target, origin, next) {
+      /* beforeEnter (target, origin, next) {
         // 路由拦截, 防止没有权限进入管理页
-        /* const user = store.state.user
+        const user = store.state.user
         if (user && user._level / 1 === 0) {
           next()
         } else {
           next('/')
-        } */
-      },
+        }
+      }, */
       children: [
         { // 单词管理
           path: 'wordManage',

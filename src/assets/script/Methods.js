@@ -1,6 +1,7 @@
 export default{
   // path: 'http://10.21.40.160/Memory_word/static/php', // npm run build use
   path: 'http://10.21.40.160/Vue_project/Memory-word/static/php', // api public path
+  // path: 'http://10.21.40.40/xili/Memory_word/static/php', // star server use
   popup (msg = '') {
     alert(msg)
   },
